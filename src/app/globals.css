@@ -1,0 +1,70 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: light;
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+  --dur-short: 160ms;
+  --dur-base: 320ms;
+  --dur-long: 640ms;
+}
+
+html,
+body {
+  background: #f6efe2;
+  color: #1a1612;
+  font-family: var(--font-body), system-ui, "Hiragino Sans", "Hiragino Kaku Gothic ProN", "Noto Sans JP", sans-serif;
+  font-feature-settings: "palt";
+  letter-spacing: 0.02em;
+}
+
+/* 和紙の下地：淡い繊維ノイズを CSS だけで */
+body.washi-ground {
+  background-image:
+    radial-gradient(1200px 800px at 10% -10%, rgba(236, 226, 209, 0.9), transparent 60%),
+    radial-gradient(900px 600px at 110% 110%, rgba(223, 211, 188, 0.6), transparent 55%),
+    url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='140' height='140'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0.18  0 0 0 0 0.14  0 0 0 0 0.11  0 0 0 0.035 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+  background-blend-mode: normal, normal, multiply;
+}
+
+.font-fude {
+  font-family: var(--font-fude), "Hiragino Mincho ProN", serif;
+  font-feature-settings: "palt";
+  letter-spacing: 0.08em;
+}
+
+.font-mincho {
+  font-family: var(--font-mincho), "Hiragino Mincho ProN", serif;
+}
+
+/* 筆ストロークの縁（カードの縁や注意用）*/
+.stroke-edge {
+  position: relative;
+}
+.stroke-edge::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  border-radius: inherit;
+  box-shadow: inset 0 0 0 1px rgba(26, 22, 18, 0.1);
+}
+
+/* 判定レーンの縁色（意味を縁で持つ）*/
+.lane-refuse { border-left: 3px solid #8a3a30; }
+.lane-risk   { border-left: 3px solid #b7892a; }
+.lane-wait   { border-left: 3px solid #6b5d50; }
+.lane-ok     { border-left: 3px solid #5e7a3e; }
+
+/* カウントアップ用 */
+.tabular { font-variant-numeric: tabular-nums; }
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+}

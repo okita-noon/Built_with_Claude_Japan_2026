@@ -1,0 +1,17 @@
+{
+  "note": "課税明細書の OCR 結果のモック。実在の様式ではない。",
+  "owner": "父",
+  "mail_to": "大字栗原（デモ・架空）",
+  "fiscal_year": 2024,
+  "lines": [
+    { "chiban": "大字栗原 101", "chimoku_tax": "畑", "menseki_m2": 820, "kazei_hyoka_en": 0 },
+    { "chiban": "大字栗原 102", "chimoku_tax": "畑", "menseki_m2": 540, "kazei_hyoka_en": 0 },
+    { "chiban": "大字栗原 103", "chimoku_tax": "宅地", "menseki_m2": 450, "kazei_hyoka_en": 320000 },
+    { "chiban": "大字栗原 104", "chimoku_tax": "田", "menseki_m2": 1100, "kazei_hyoka_en": 0 },
+    { "chiban": "大字栗原 105", "chimoku_tax": "畑", "menseki_m2": 600, "kazei_hyoka_en": 0 },
+    { "chiban": "大字栗原 106", "chimoku_tax": "田", "menseki_m2": 980, "kazei_hyoka_en": 0 },
+    { "chiban": "大字栗原 201", "chimoku_tax": "山林", "menseki_m2": 12000, "kazei_hyoka_en": 0 },
+    { "chiban": "大字栗原 202", "chimoku_tax": "山林", "menseki_m2": 8600, "kazei_hyoka_en": 0 },
+    { "chiban": "大字栗原 203", "chimoku_tax": "山林", "menseki_m2": 15400, "kazei_hyoka_en": 0 }
+  ]
+}

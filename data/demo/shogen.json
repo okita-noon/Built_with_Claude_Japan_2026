@@ -1,0 +1,12 @@
+[
+  { "id": "SH01", "fude_candidates": ["D001"], "text": "栗の木のとこまでがうちやで。隣とはもめたことない。", "tags": ["Q_BOUNDARY_HINT"] },
+  { "id": "SH02", "fude_candidates": ["D003"], "text": "お父さんが建てた家。もう誰も住んどらん。", "tags": ["R_BUILDING_HINT"] },
+  { "id": "SH03", "fude_candidates": ["D004"], "text": "お父さんが若い頃に植えて、それっきりや。", "tags": ["D_FOREST_HINT"] },
+  { "id": "SH04", "fude_candidates": ["D005"], "text": "佐藤さんがずっと作ってくれとる。お礼にお米もろたり。", "tags": ["R_SECURITY_HINT"] },
+  { "id": "SH05", "fude_candidates": ["D006"], "text": "下のほうが崩れたことがあったわ。もう昔やけど。", "tags": ["D_CLIFF_HINT", "D_DISASTER_HINT"] },
+  { "id": "SH06", "fude_candidates": ["D007"], "text": "農機具を入れとる小屋があるんよ。登記はしてないと思う。", "tags": ["R_BUILDING_HINT"] },
+  { "id": "SH07", "fude_candidates": ["D008"], "text": "ヒノキのほうは、組合に頼んで何年か前にやってもろた。", "tags": ["OK_FOREST_CARED"] },
+  { "id": "SH08", "fude_candidates": ["D009"], "text": "むかしは米やってたけど、いまは何も作っとらん。", "tags": ["OK_FARMLAND_FALLOW"] },
+  { "id": "SH09", "fude_candidates": ["D010"], "text": "ずっとおくに、お父さんのお父さんの代の畑がもう一つあったような気がする。", "tags": ["LOC_UNKNOWN"] },
+  { "id": "SH10", "fude_candidates": ["D001", "D009"], "text": "田と畑が隣り合っとってな、お父さんが行き来しとった。", "tags": ["MULTI"] }
+]
