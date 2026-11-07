@@ -10,7 +10,7 @@ export type BridgeEvent =
   | { type: "transcript"; text: string; at: number }
   | { type: "tag"; text: string; result: JevTagResult; at: number }
   | { type: "fatigue"; score: number; at: number }
-  | { type: "say"; message: string; at: number }  // 家族 → 親：読み上げ指示
+  | { type: "say"; message: string; yobina?: string; at: number }  // 家族 → 親：読み上げ指示（親の画面にも同じ質問を出す）
   | { type: "focus"; yobina: string; at: number };
 
 const CHANNEL = "fudekoe.bridge.v1";

@@ -42,6 +42,7 @@ export default function FamilyPage() {
     const base = list ?? items;
     const it = base.find((x) => x.card.id === id);
     setActiveId(id);
+    setQuestion(null); // 前の筆の質問を残さない
     if (!it) return;
     const r = await fetch("/api/next-question", {
       method: "POST",
@@ -146,8 +147,8 @@ export default function FamilyPage() {
   }, [activeId]);
 
   // 親に読み上げを依頼する
-  const sayToParent = useCallback((msg: string) => {
-    publish({ type: "say", message: msg, at: Date.now() });
+  const sayToParent = useCallback((msg: string, yobina?: string) => {
+    publish({ type: "say", message: msg, yobina, at: Date.now() });
   }, []);
 
   const answer = useCallback(async (choice: 0 | 1) => {
@@ -216,7 +217,7 @@ export default function FamilyPage() {
         </div>
         {question && (
           <button
-            onClick={() => sayToParent(question.prompt)}
+            onClick={() => sayToParent(question.prompt, active?.card.yobina || active?.card.chiban)}
             className="px-4 py-2 rounded-md bg-washi border border-sumi-300 text-sumi-700 font-mincho text-sm hover:bg-sumi-50"
             title="親の画面に音声で読み上げを依頼"
           >

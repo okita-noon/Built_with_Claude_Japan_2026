@@ -14,3 +14,6 @@ tsconfig.tsbuildinfo
 # Cloudflare Workers / OpenNext ビルド成果物
 .open-next/
 .wrangler/
+
+# デモ動画の生成物
+out/

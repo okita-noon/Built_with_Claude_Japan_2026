@@ -1,6 +1,6 @@
 /**
  * デモ用のキャンド発話。Gemini Live の文字起こしに相当する想定で、
- * `chunks` を順に流し、各 chunk を Jev タグ付け → Claude 判定にかける。
+ * `chunks` を順に流し（delay_ms は親がその文を話し終えるまでの目安）、各 chunk を Jev タグ付け → Claude 判定にかける。
  */
 export type DemoTranscript = {
   id: string;
@@ -15,11 +15,11 @@ export const DEMO_TRANSCRIPTS: DemoTranscript[] = [
     title: "栗の木の畑：境と小屋の話",
     yobina: "栗の木の畑",
     chunks: [
-      { text: "あのな、栗の木のとこの畑やけどな、" },
-      { text: "隣の田中さんとは、昔、栗の木までがうちや、言うてな、" },
-      { text: "見て決めたことがあったよ。" },
-      { text: "小屋かい？壁も屋根もあるで。中に農機具置いてた。" },
-      { text: "崖はないよ。ゆるい斜面で、水はけはええ。" },
+      { text: "あのな、栗の木のとこの畑やけどな、", delay_ms: 4000 },
+      { text: "隣の田中さんとは、昔、栗の木までがうちや、言うてな、", delay_ms: 5200 },
+      { text: "見て決めたことがあったよ。", delay_ms: 3500 },
+      { text: "小屋かい？壁も屋根もあるで。中に農機具置いてた。", delay_ms: 4900 },
+      { text: "崖はないよ。ゆるい斜面で、水はけはええ。", delay_ms: 4400 },
     ],
   },
   {

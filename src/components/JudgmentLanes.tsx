@@ -5,7 +5,7 @@ import { LANE_FOR_VERDICT } from "@/lib/types";
 import { ChimokuGlyph } from "./BrushGlyph";
 
 const LANES: Array<{ key: "refuse" | "risk" | "wait" | "ok"; label: string; cls: string; hint: string }> = [
-  { key: "refuse", label: "申請不可", cls: "lane-refuse", hint: "法令上、国庫帰属の申請そのものができない筆（建物あり・担保ありなど）" },
+  { key: "refuse", label: "申請できない可能性", cls: "lane-refuse", hint: "建物・担保などがあると申請できない。該当するかの最終判断は法務局" },
   { key: "risk", label: "不承認の可能性", cls: "lane-risk", hint: "申請はできるが、審査で不承認になる可能性が高い筆（崖・災害警戒区域など）" },
   { key: "wait", label: "情報が足りない", cls: "lane-wait", hint: "判定に必要な証言や書類が足りていない筆。親に聞き直しが必要" },
   { key: "ok", label: "検討できる", cls: "lane-ok", hint: "要件上は検討できる筆。最終判断は法務局の審査" },

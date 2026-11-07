@@ -50,6 +50,9 @@ export default function ParentPage() {
     // 家族の画面から「次の質問を親に読み上げて」の指示を受け取る
     const unsub = subscribe((ev) => {
       if (ev.type === "say") {
+        // 家族が選んだ筆の質問に差し替える（親の画面は「いま話している場所」1つだけ）
+        if (ev.yobina) setCard((c) => (c ? { ...c, yobina: ev.yobina } : c));
+        setQuestion((q) => ({ code: q?.code ?? "say", choices: q?.choices ?? ["", ""], for_fude_id: q?.for_fude_id ?? "", prompt: ev.message }));
         try {
           const u = new SpeechSynthesisUtterance(ev.message);
           u.lang = "ja-JP";
@@ -163,7 +166,7 @@ export default function ParentPage() {
         <AnimatePresence>
           {question && !currentChunk && (
             <motion.div
-              key={question.code}
+              key={question.prompt}
               initial={{ y: 20, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
               exit={{ y: -20, opacity: 0 }}
