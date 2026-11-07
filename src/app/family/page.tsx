@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useMemo, useState, useCallback } from "react";
+import { useEffect, useMemo, useState, useCallback, useRef } from "react";
 import dynamic from "next/dynamic";
 import Link from "next/link";
 import { BrandMark } from "@/components/BrandMark";
@@ -25,6 +25,8 @@ export default function FamilyPage() {
   const [intentsTick, setIntentsTick] = useState(0);
   const [liveTranscript, setLiveTranscript] = useState<string | null>(null);
   const [fatigue, setFatigue] = useState<number | null>(null);
+  // 筆ごとに、すでに親に聞いた質問。同じ問いを繰り返さない
+  const askedRef = useRef<Record<string, string[]>>({});
 
   useEffect(() => {
     (async () => {
@@ -47,7 +49,7 @@ export default function FamilyPage() {
     const r = await fetch("/api/next-question", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ card: it.card }),
+      body: JSON.stringify({ card: it.card, asked: askedRef.current[it.card.id] ?? [] }),
     });
     const j = (await r.json()) as { question: NextQuestion | null; judge: JudgeResult };
     setQuestion(j.question);
@@ -98,7 +100,7 @@ export default function FamilyPage() {
             fetch("/api/next-question", {
               method: "POST",
               headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({ card: match.card }),
+              body: JSON.stringify({ card: match.card, asked: askedRef.current[match.card.id] ?? [] }),
             }).then((r) => r.json()).then((j: { question: NextQuestion | null }) => setQuestion(j.question));
           }
           return cur;
@@ -133,7 +135,7 @@ export default function FamilyPage() {
                 fetch("/api/next-question", {
                   method: "POST",
                   headers: { "Content-Type": "application/json" },
-                  body: JSON.stringify({ card: updated }),
+                  body: JSON.stringify({ card: updated, asked: askedRef.current[updated.id] ?? [] }),
                 })
                   .then((r) => r.json())
                   .then((j: { question: NextQuestion | null }) => setQuestion(j.question));
@@ -196,11 +198,12 @@ export default function FamilyPage() {
     const nj = (await r.json()) as JudgeResult;
     const next = items.map((x) => (x.card.id === active.card.id ? { card: updated, judge: nj } : x));
     setItems(next);
-    // 次の質問
+    // 次の質問（いま答えた問いは聞いた扱いにする）
+    askedRef.current[updated.id] = [...(askedRef.current[updated.id] ?? []), question.code];
     const r2 = await fetch("/api/next-question", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ card: updated }),
+      body: JSON.stringify({ card: updated, asked: askedRef.current[updated.id] }),
     });
     const qj = (await r2.json()) as { question: NextQuestion | null };
     setQuestion(qj.question);

@@ -55,38 +55,42 @@ function archHtml(): string {
   return `${HEAD}<div class="brand">筆のこえ</div>
   <svg width="1920" height="1080" style="position:absolute;inset:0">
     <defs><marker id="a" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto"><path d="M0,0 L12,6 L0,12 z" fill="${C.sumi500}"/></marker></defs>
-    ${arrow(450, 470, 560, 470)}${arrow(1010, 470, 1120, 470)}${arrow(1570, 470, 1640, 470)}
-    ${arrow(1345, 730, 1345, 615)}${arrow(1345, 330, 1345, 255)}
+    ${arrow(340, 470, 400, 470)}${arrow(720, 470, 780, 470)}${arrow(1100, 470, 1160, 470)}${arrow(1540, 470, 1600, 470)}
+    ${arrow(1350, 730, 1350, 615)}${arrow(1350, 330, 1350, 255)}
   </svg>
-  ${box(90, 340, 360, 260, "親の声", "話すだけ。<br>方言のまま。", C.sumi900)}
-  ${box(560, 340, 450, 260, "Gemini Live", "声を文字に。<br>ブラウザ直結・<br>短命トークン", C.ai)}
-  ${box(1120, 340, 450, 270, "Claude", "判定・理由<br>次の二択の質問<br>士業法ガードの言い換え", C.beni)}
-  ${box(1640, 340, 220, 260, "家族", "地図<br>カード<br>論点", C.matcha)}
-  ${box(1060, 740, 570, 250, "Skills", "制度の要件・士業の線引き（.claude/skills）<br>開発の Claude Code と本番で共用", C.kincha)}
-  ${box(1060, 70, 570, 185, "評価（evals/）", "判定25件・ガード50件で毎回採点", C.sumi700)}
+  ${box(60, 340, 280, 260, "親の声", "話すだけ。<br>方言のまま。", C.sumi900)}
+  ${box(400, 340, 320, 260, "Gemini Live", "声を文字に<br>（ブラウザ直結）", C.ai)}
+  ${box(780, 340, 320, 260, "Jev", "その場でタグ付け<br>どの土地の話か<br>何の事実か・疲れ", C.sumi700)}
+  ${box(1160, 340, 380, 270, "Claude", "判定・理由<br>次の二択の質問<br>士業法ガードの言い換え", C.beni)}
+  ${box(1600, 340, 260, 260, "家族", "地図<br>カード<br>論点", C.matcha)}
+  ${box(1065, 740, 570, 250, "Skills", "制度の要件・士業の線引き（.claude/skills）<br>開発の Claude Code と本番で共用", C.kincha)}
+  ${box(1065, 70, 570, 185, "評価（evals/）", "判定25件・ガード50件・効果測定25件", C.sumi700)}
   </body></html>`;
 }
 
 function evalsHtml(): string {
-  const bar = (label: string, before: number, after: number, afterLabel: string, y: number) => `
+  const bar = (label: string, before: number, after: number, y: number) => `
   <div style="position:absolute;left:160px;top:${y}px;width:1600px">
-    <div style="font-size:50px;font-weight:700">${label}</div>
-    <div style="display:flex;align-items:center;gap:28px;margin-top:22px">
-      <div class="mincho" style="width:210px;font-size:30px;color:${C.sumi500}">Skills なし</div>
-      <div style="height:54px;width:${before * 11}px;background:${C.sumi300};border-radius:6px"></div>
-      <div style="font-size:48px;font-weight:700;color:${C.sumi500}">${before}%</div>
+    <div style="font-size:46px;font-weight:700">${label}</div>
+    <div style="display:flex;align-items:center;gap:28px;margin-top:18px">
+      <div style="width:230px;font-size:30px;color:${C.sumi500}">アプリなし</div>
+      <div style="height:50px;width:${before * 11}px;background:${C.sumi300};border-radius:6px"></div>
+      <div style="font-size:46px;font-weight:700;color:${C.sumi500}">${before}%</div>
     </div>
-    <div style="display:flex;align-items:center;gap:28px;margin-top:16px">
-      <div class="mincho" style="width:210px;font-size:30px;color:${C.sumi900}">Skills あり</div>
-      <div style="height:54px;width:${after * 11}px;background:${C.beni};border-radius:6px"></div>
-      <div style="font-size:60px;font-weight:700;color:${C.beni}">${afterLabel}</div>
+    <div style="display:flex;align-items:center;gap:28px;margin-top:14px">
+      <div style="width:230px;font-size:30px;font-weight:700;color:${C.sumi900}">アプリあり</div>
+      <div style="height:50px;width:${after * 11}px;background:${C.beni};border-radius:6px"></div>
+      <div style="font-size:58px;font-weight:700;color:${C.beni}">${after}%</div>
     </div>
   </div>`;
   return `${HEAD}<div class="brand">筆のこえ</div>
-  ${bar("制度の判定（25件）", 84, 100, "100%", 150)}
-  ${bar("士業の領域に踏み込む質問を止めた（25件）", 88, 96, "96%〜", 470)}
-  <div class="mincho" style="position:absolute;left:160px;top:820px;font-size:40px;color:${C.sumi700}">答えてよい質問を止めすぎた　<span style="font-size:60px;font-weight:700;color:${C.matcha}">0件</span><span style="font-size:30px;color:${C.sumi500}"> / 15</span></div>
-  <div class="mincho" style="position:absolute;left:160px;top:930px;font-size:26px;color:${C.sumi400}">claude-sonnet-5-5・2回実行。判定の100%は同じ25件を見ながら直した値（docs/eval-log.md）</div>
+  <div style="position:absolute;left:160px;top:120px;font-size:34px;color:${C.sumi700}">親役・子役を AI で模擬し、8問ずつ聞き取り（25件）</div>
+  ${bar("必要な項目を聞き出せた", 49, 70, 200)}
+  ${bar("判定が正解と一致", 72, 84, 470)}
+  <div style="position:absolute;left:160px;top:760px;font-size:38px;font-weight:700;color:${C.sumi900}">
+    Skills で判定 <span style="color:${C.sumi500}">84%</span> → <span style="color:${C.beni}">100%</span>　／　士業ガード 96%以上・止めすぎ <span style="color:${C.matcha}">0件</span>
+  </div>
+  <div style="position:absolute;left:160px;top:900px;width:1600px;font-size:24px;line-height:1.6;color:${C.sumi400}">claude-sonnet-5-5。模擬の聞き取りで、実際の家族での効果ではありません。判定の100%は同じ25件を見ながら直した値（docs/eval-log.md）</div>
   </body></html>`;
 }
 

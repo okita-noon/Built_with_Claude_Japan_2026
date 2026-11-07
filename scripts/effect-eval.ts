@@ -137,12 +137,14 @@ async function runWithout(truth: FudeCard, expected: string): Promise<ArmResult>
 async function runWith(truth: FudeCard, expected: string): Promise<ArmResult> {
   const base = initialCard(truth);
   let card = base;
+  const asked: string[] = [];
   let transcript = "";
   const qs: string[] = [];
   for (let t = 0; t < TURNS; t++) {
     const j = await judgeWithClaude(card);
-    const nq = await nextQuestionWithClaude(card, j);
+    const nq = await nextQuestionWithClaude(card, j, asked);
     if (!nq) break;
+    asked.push(nq.code);
     const q = nq.prompt;
     qs.push(q);
     const a = await ask(PARENT_SYS(truth), `ここまでの会話：\n${transcript}\n\n子：${q}\n\nあなた（親）の答え：`, 600);

@@ -151,13 +151,22 @@ async function main() {
 
   // ---- 09 聞き直し（うえの畑）----
   // 次の質問は Claude が選ぶ（毎回同じとは限らない）。用意したどちらかの質問が出るまで待つ（待ちは編集で切る）
-  await family.getByText("うえの畑").first().click();
+  // 「使っている人」の質問だとマスが確実に埋まるので、それが出るまで選び直す（待ちは編集で切る）
   let ask: (typeof ASKS)[number] | undefined;
-  for (let i = 0; i < 300 && !ask; i++) {
-    for (const a of ASKS) if (await family.getByText(a.question).first().isVisible().catch(() => false)) ask = a;
-    if (!ask) await sleep(0.2);
+  for (let attempt = 0; attempt < 5; attempt++) {
+    if (attempt) { await family.getByText("おくの畑").first().click(); await sleep(1.5); }
+    await family.getByText("うえの畑").first().click();
+    ask = undefined;
+    for (let i = 0; i < 200 && !ask; i++) {
+      for (const a of ASKS) if (await family.getByText(a.question).first().isVisible().catch(() => false)) ask = a;
+      if (!ask) await sleep(0.2);
+    }
+    if (ask?.key === "use") break;
+    log(`ask = ${ask?.key ?? "none"} → 選び直す`);
   }
   if (!ask) throw new Error("想定した質問が出ない");
+  await sleep(1.0);
+  if (!(await family.getByText(ask.question).first().isVisible())) throw new Error("質問が切り替わった");
   log(`ask = ${ask.key}`);
   const q1 = ask.question;
   await sleep(0.3);

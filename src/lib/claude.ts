@@ -213,9 +213,12 @@ export async function guardWithClaude(kind: "prompt" | "output", input: string):
   };
 }
 
-export async function nextQuestionWithClaude(card: FudeCard, j: JudgeResult): Promise<NextQuestion | null> {
+export async function nextQuestionWithClaude(card: FudeCard, j: JudgeResult, asked: string[] = []): Promise<NextQuestion | null> {
   // 判定が「要件上は検討できる」で asks が空なら質問不要
   if (!j.asks.length && j.verdict === "要件上は検討できる") return null;
+  // 一度聞いた質問は繰り返さない（答えが曖昧でカードが埋まらなくても、同じ問いで親を疲れさせない）
+  const remaining = j.asks.filter((a) => !asked.includes(a));
+  if (j.asks.length && !remaining.length) return null;
 
   const client = getClient();
   const resp = await client.messages.create({
@@ -227,12 +230,13 @@ export async function nextQuestionWithClaude(card: FudeCard, j: JudgeResult): Pr
     tool_choice: { type: "auto" },
     messages: [{
       role: "user",
-      content: `筆カード:\n\`\`\`json\n${JSON.stringify(card, null, 2)}\n\`\`\`\n\n直近の判定:\n\`\`\`json\n${JSON.stringify(j, null, 2)}\n\`\`\``,
+      content: `筆カード:\n\`\`\`json\n${JSON.stringify(card, null, 2)}\n\`\`\`\n\n直近の判定:\n\`\`\`json\n${JSON.stringify({ ...j, asks: remaining.length ? remaining : j.asks }, null, 2)}\n\`\`\`${asked.length ? `\n\nすでに聞いた質問（選ばない）: ${asked.join(", ")}` : ""}`,
     }],
   });
   const data = pickToolInput(resp, "pick_next_question");
   if (!data) return null;
-  const code = String(data.ask_code ?? "");
+  let code = String(data.ask_code ?? "");
+  if (asked.includes(code) && remaining.length) code = remaining[0];
   const q = ALL_QUESTIONS[code];
   if (!q) return null;
   return { ...q, for_fude_id: card.id };

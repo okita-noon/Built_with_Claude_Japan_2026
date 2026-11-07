@@ -7,14 +7,14 @@ import type { FudeCard } from "@/lib/types";
 export const runtime = "nodejs";
 
 export async function POST(req: Request) {
-  const body = (await req.json()) as { card?: FudeCard; mode?: "mock" | "claude" };
+  const body = (await req.json()) as { card?: FudeCard; mode?: "mock" | "claude"; asked?: string[] };
   if (!body?.card) return NextResponse.json({ error: "card is required" }, { status: 400 });
 
   const useClaude = body.mode !== "mock" && isClaudeConfigured();
   if (useClaude) {
     try {
       const j = await judgeWithClaude(body.card);
-      const q = await nextQuestionWithClaude(body.card, j);
+      const q = await nextQuestionWithClaude(body.card, j, body.asked ?? []);
       return NextResponse.json({ question: q, judge: j, engine: "claude" });
     } catch (e) {
       const msg = e instanceof Error ? e.message : String(e);
