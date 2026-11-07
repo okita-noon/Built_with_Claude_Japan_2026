@@ -28,6 +28,26 @@ Anthropic 直 API の設定（Claude 呼び出し）
 - `CLAUDE_MODEL`：モデル ID（例：`claude-opus-4-7`, `claude-sonnet-4-6`）
 - ローカルは `.env.local` に書く。Cloudflare Workers 上では `wrangler secret put ANTHROPIC_API_KEY` で登録
 
+## Cloudflare 側の設定（Bot 対策）
+
+アクセス制御（Cloudflare Access）は入れない。デモは誰でも開ける。代わりに、
+AI 学習クローラーと営業系スクレイパーだけを落とす。
+
+**ダッシュボード側**（`fudekoe.okita.dev` のゾーン）
+
+- Security → Bots → **Bot Fight Mode を ON**（Free プランで無料）
+- Security → WAF → Managed rules → Cloudflare Managed Ruleset を有効化
+- Security → WAF → Custom rules に以下を追加（必要なら）
+  - 式：`(cf.verified_bot) and not (cf.bot_management.verified_bot_category in {"Search Engine Crawler"})`
+  - 動作：Block（検索クローラー以外の検証済みボットを拒否）
+- 必要に応じて Rate limiting rule（10 req/10s）を `/api/*` に設定
+
+**コード側**（`src/middleware.ts` と `public/robots.txt`）
+
+- UA 一致で GPTBot・ClaudeBot・CCBot・PerplexityBot などを 403 で落とす
+- `robots.txt` で同じクローラーを拒否（polite layer）
+- ダッシュボード側が落ちても最低限の遮断が残るように二重化
+
 ## 初日に確かめること
 
 - [ ] 運営に確認：他社API（Gemini・Jev）の利用可否、既存コードの扱い、OSS の範囲、動画の長さ
