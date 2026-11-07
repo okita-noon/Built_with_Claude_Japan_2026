@@ -4,6 +4,7 @@ import Link from "next/link";
 import { motion } from "motion/react";
 import { BrandMark } from "@/components/BrandMark";
 import { BrushGlyph, ChimokuGlyph } from "@/components/BrushGlyph";
+import { CounterEmailDraft } from "@/components/CounterEmailDraft";
 import type { FudeCard, JudgeResult } from "@/lib/types";
 
 type Enriched = { card: FudeCard; judge: JudgeResult };
@@ -50,6 +51,7 @@ const BRINGS: Record<Office, string[]> = {
 export default function CounterPage() {
   const [items, setItems] = useState<Enriched[]>([]);
   const [office, setOffice] = useState<Office>("forestry");
+  const [town, setTown] = useState<string | undefined>(undefined);
 
   useEffect(() => {
     (async () => {
@@ -57,6 +59,10 @@ export default function CounterPage() {
       const j = (await r.json()) as { fude: Enriched[] };
       setItems(j.fude);
     })();
+    try {
+      const t = window.localStorage.getItem("fudekoe.town.v1");
+      if (t) setTown(t);
+    } catch {}
   }, []);
 
   const filtered = useMemo(() => filterFor(office, items), [office, items]);
@@ -158,6 +164,12 @@ export default function CounterPage() {
           <p className="mt-6 text-xs font-mincho text-sumi-400">
             ※ 法定様式の記入はしません。{curOffice.name}の窓口で受け取り、ここに書いてある情報と並べて記入してください。
           </p>
+          <CounterEmailDraft
+            office={office}
+            officeName={curOffice.name}
+            items={filtered}
+            townName={town}
+          />
         </aside>
       </div>
     </main>

@@ -61,7 +61,10 @@ export default function Onboarding() {
                   className="flex-1 bg-washi border border-sumi-200 focus:border-sumi-500 outline-none rounded-md px-5 py-4 font-mincho text-lg text-sumi-900 placeholder:text-sumi-300"
                 />
                 <button
-                  onClick={() => setStep("slip")}
+                  onClick={() => {
+                    try { window.localStorage.setItem("fudekoe.town.v1", town.trim()); } catch {}
+                    setStep("slip");
+                  }}
                   disabled={!town.trim()}
                   className="px-6 py-4 rounded-md bg-sumi-900 text-washi font-mincho text-lg disabled:opacity-30 hover:bg-sumi-800 transition-colors"
                 >
