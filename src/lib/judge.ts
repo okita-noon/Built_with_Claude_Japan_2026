@@ -14,7 +14,20 @@ export function judge(card: FudeCard, today = new Date("2026-11-04")): JudgeResu
   const asks: string[] = [];
   const flags: string[] = [];
 
+  // 資格 E_*：相続（遺贈を含む）で取得した人だけが申請できる
+  // 遺産分割していない・先代名義のまま → 相続人全員の共有として扱う
+  const undivided = has(card.shutoku, /未確定|遺産分割していない|未分割/) || has(card.meigi, /祖父|祖母|曾祖/);
+  if (missing(card.shutoku)) asks.push("Q_ACQUISITION");
+  else if (!undivided && !/相続|遺贈/.test(card.shutoku)) reasons.push("E_NOT_INHERITED");
+  if (has(card.meigi, /共有/) || undivided) {
+    reasons.push("E_COOWNERS_ALL");
+    asks.push("Q_HEIRS");
+  }
+
   // 却下 R_*
+  if (/墓地|公衆用道路|用悪水路|ため池|井溝/.test(card.toki_chimoku || "") || has(card.genkyo, /墓|道路として|水路/))
+    reasons.push("R_OTHERS_USE");
+
   if (has(card.building, /有/) && !/物置|簡易/.test(card.building)) reasons.push("R_BUILDING");
   else if (missing(card.building)) asks.push("Q_BUILDING");
 
@@ -34,10 +47,18 @@ export function judge(card: FudeCard, today = new Date("2026-11-04")): JudgeResu
   if (has(card.underground, /有|埋/)) reasons.push("D_UNDERGROUND_OBJECT");
   else if (missing(card.underground)) asks.push("Q_UNDERGROUND");
 
-  if (has(card.forest_care, /間伐されていない|放置|されていない/)) reasons.push("D_FOREST");
+  const structs = (card.structures || []).join("、");
+  if (/竹|倒木|枯れ木|廃材|放置車両|廃屋/.test(structs)) reasons.push("D_SURFACE_OBJECT");
+  if (/倒/.test(structs + (card.genkyo || "")) && /隣家|隣の家|道路|人家/.test(structs + (card.shogen || "")))
+    reasons.push("D_DISASTER");
+
+  if (has(card.neighbor_trouble, /^有|通行|拒|争/)) reasons.push("D_NEIGHBOR_LITIGATION");
+
+  if (has(card.forest_care, /間伐されていない|放置|されていない|未整備/)) reasons.push("D_FOREST");
   else if (card.toki_chimoku === "山林" && missing(card.forest_care)) asks.push("Q_FOREST_CARE");
 
-  if (has(card.disaster, /警戒|危険|土砂災害/) && !has(card.disaster, /外/)) reasons.push("D_DISASTER");
+  if (has(card.disaster, /警戒|危険|土砂災害/) && !has(card.disaster, /外/) && !reasons.includes("D_DISASTER"))
+    reasons.push("D_DISASTER");
 
   if (has(card.recurring_charges, /有|賦課|改良区/)) reasons.push("D_MONETARY_DEBT");
   else if (missing(card.recurring_charges)) asks.push("Q_DEBT");
@@ -103,8 +124,8 @@ function reasonHuman(code: string): string {
     D_ANIMAL: "鳥獣・病害虫の被害",
     D_FOREST: "手入れされていない人工林",
     D_MONETARY_DEBT: "毎年の金銭負担がある",
-    E_NOT_INHERITED: "相続以外で取得した",
-    E_COOWNERS_ALL: "共有者全員の申請が必要",
+    E_NOT_INHERITED: "相続以外（売買など）で取得した土地である",
+    E_COOWNERS_ALL: "共有者全員での申請が必要",
   };
   return map[code] || code;
 }

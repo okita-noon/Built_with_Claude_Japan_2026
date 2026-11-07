@@ -6,6 +6,7 @@ import type { FudeCard, NextQuestion } from "@/lib/types";
 import type { JevTagResult } from "@/lib/jev";
 import { DEMO_TRANSCRIPTS } from "@/lib/transcripts";
 import { publish, subscribe } from "@/lib/bridge";
+import { startLive, type LiveSession } from "@/lib/gemini-live";
 
 type Enriched = { card: FudeCard; judge: { verdict: string } };
 
@@ -17,6 +18,8 @@ export default function ParentPage() {
   const [playingId, setPlayingId] = useState<string | null>(null);
   const [geminiReady, setGeminiReady] = useState<"unknown" | "ready" | "fallback">("unknown");
   const stopRef = useRef<{ stopped: boolean }>({ stopped: false });
+  const liveRef = useRef<LiveSession | null>(null);
+  const [level, setLevel] = useState(0);
 
   useEffect(() => {
     (async () => {
@@ -36,8 +39,9 @@ export default function ParentPage() {
     // Gemini トークン可否を確認（鍵なしなら 501 → fallback）
     (async () => {
       try {
-        const r = await fetch("/api/gemini/token", { method: "POST" });
-        setGeminiReady(r.ok ? "ready" : "fallback");
+        const r = await fetch("/api/gemini/token");
+        const j = (await r.json()) as { available?: boolean };
+        setGeminiReady(j.available ? "ready" : "fallback");
       } catch {
         setGeminiReady("fallback");
       }
@@ -58,8 +62,56 @@ export default function ParentPage() {
     return () => {
       unsub();
       stopRef.current.stopped = true;
+      liveRef.current?.stop();
     };
   }, []);
+
+  // 1発話を家族の画面へ流し、Jev で即時タグ（Choice/Noul/Score）を付ける
+  async function handleUtterance(text: string) {
+    publish({ type: "transcript", text, at: Date.now() });
+    try {
+      const r = await fetch("/api/jev/tag", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ text }),
+      });
+      const result = (await r.json()) as JevTagResult;
+      publish({ type: "tag", text, result, at: Date.now() });
+      if (result.score >= 70) publish({ type: "fatigue", score: result.score, at: Date.now() });
+    } catch {}
+  }
+
+  // 実 Gemini Live：タップで聞き始め、もう一度タップで終わる（長押しは親に難しい）
+  async function toggleLive() {
+    if (liveRef.current) {
+      liveRef.current.stop();
+      liveRef.current = null;
+      return;
+    }
+    setSpeaking(true);
+    try {
+      liveRef.current = await startLive({
+        onPartial: (t) => setCurrentChunk(t),
+        onUtterance: (t) => {
+          setCurrentChunk(t);
+          void handleUtterance(t);
+        },
+        onLevel: setLevel,
+        onState: (st) => {
+          if (st === "closed" || st === "error") {
+            liveRef.current = null;
+            setSpeaking(false);
+            setLevel(0);
+            setTimeout(() => setCurrentChunk(null), 2500);
+          }
+        },
+      });
+    } catch {
+      liveRef.current = null;
+      setSpeaking(false);
+      setGeminiReady("fallback");
+    }
+  }
 
   async function playTranscript(id: string) {
     if (playingId) return;
@@ -72,19 +124,7 @@ export default function ParentPage() {
     for (const chunk of t.chunks) {
       if (stopRef.current.stopped) break;
       setCurrentChunk(chunk.text);
-      publish({ type: "transcript", text: chunk.text, at: Date.now() });
-      try {
-        const r = await fetch("/api/jev/tag", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ text: chunk.text }),
-        });
-        const result = (await r.json()) as JevTagResult;
-        publish({ type: "tag", text: chunk.text, result, at: Date.now() });
-        if (result.score >= 70) {
-          publish({ type: "fatigue", score: result.score, at: Date.now() });
-        }
-      } catch {}
+      await handleUtterance(chunk.text);
       await new Promise((rs) => setTimeout(rs, chunk.delay_ms ?? 1200));
     }
     setSpeaking(false);
@@ -159,12 +199,23 @@ export default function ParentPage() {
               />
             )}
           </AnimatePresence>
+          {/* 音量に追従して輪が膨らむ（上限 1.15 倍） */}
+          {geminiReady === "ready" && speaking && (
+            <div
+              className="absolute inset-0 rounded-full bg-sumi-900/15 transition-transform duration-100"
+              style={{ transform: `scale(${1 + Math.min(0.15, level * 0.15)})` }}
+            />
+          )}
           <button
-            onMouseDown={() => setSpeaking(true)}
-            onMouseUp={() => setSpeaking(false)}
-            onMouseLeave={() => setSpeaking(false)}
-            onTouchStart={() => setSpeaking(true)}
-            onTouchEnd={() => setSpeaking(false)}
+            {...(geminiReady === "ready"
+              ? { onClick: () => void toggleLive() }
+              : {
+                  onMouseDown: () => setSpeaking(true),
+                  onMouseUp: () => setSpeaking(false),
+                  onMouseLeave: () => setSpeaking(false),
+                  onTouchStart: () => setSpeaking(true),
+                  onTouchEnd: () => setSpeaking(false),
+                })}
             className="relative w-44 h-44 rounded-full bg-sumi-900 text-washi font-fude text-3xl grid place-items-center shadow-card hover:bg-sumi-800 active:scale-[0.98] transition-transform"
             aria-label="話す"
           >
@@ -176,7 +227,7 @@ export default function ParentPage() {
         <div className="w-full">
           <div className="text-xs font-mincho text-sumi-400 text-center mb-2">
             {geminiReady === "ready"
-              ? "Gemini Live に接続できます（デモ発話はキャンドを使用）"
+              ? "話すボタンで Gemini Live に接続。キャンドのデモ発話も流せる："
               : "Gemini Live 未接続。キャンドのデモ発話を流す："}
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
