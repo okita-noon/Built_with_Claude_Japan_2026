@@ -155,10 +155,11 @@ export async function judgeWithClaude(card: FudeCard): Promise<JudgeResult> {
   const client = getClient();
   const resp = await client.messages.create({
     model: getModel(),
-    max_tokens: 1024,
-    system: SEIDO_SYSTEM,
+    max_tokens: 8000, // 思考（adaptive）ぶんの余裕
+    system: `${SEIDO_SYSTEM}\n\n回答は必ず fude_verdict ツールを1回呼んで返す。ツール以外の文章は書かない。`,
     tools: [SEIDO_TOOL],
-    tool_choice: { type: "tool", name: "fude_verdict" },
+    // Sonnet 5.5 以降は tool_choice の強制（tool/any）が 400 になるため auto＋指示で呼ばせる
+    tool_choice: { type: "auto" },
     messages: [{
       role: "user",
       content: `筆カード:\n\n\`\`\`json\n${JSON.stringify(card, null, 2)}\n\`\`\``,
@@ -191,10 +192,11 @@ export async function guardWithClaude(kind: "prompt" | "output", input: string):
     : "次はアプリがユーザーに返そうとしている出力案です。そのまま出してよいか判定してください。";
   const resp = await client.messages.create({
     model: getModel(),
-    max_tokens: 600,
-    system: GUARD_SYSTEM,
+    max_tokens: 8000, // 思考（adaptive）ぶんの余裕
+    system: `${GUARD_SYSTEM}\n\n回答は必ず shigyo_decision ツールを1回呼んで返す。ツール以外の文章は書かない。`,
     tools: [GUARD_TOOL],
-    tool_choice: { type: "tool", name: "shigyo_decision" },
+    // Sonnet 5.5 以降は tool_choice の強制（tool/any）が 400 になるため auto＋指示で呼ばせる
+    tool_choice: { type: "auto" },
     messages: [{ role: "user", content: `${header}\n\n---\n${input}\n---` }],
   });
   const data = pickToolInput(resp, "shigyo_decision");
@@ -218,10 +220,11 @@ export async function nextQuestionWithClaude(card: FudeCard, j: JudgeResult): Pr
   const client = getClient();
   const resp = await client.messages.create({
     model: getModel(),
-    max_tokens: 400,
-    system: NEXT_Q_SYSTEM,
+    max_tokens: 8000, // 思考（adaptive）ぶんの余裕
+    system: `${NEXT_Q_SYSTEM}\n\n回答は必ず pick_next_question ツールを1回呼んで返す。ツール以外の文章は書かない。`,
     tools: [NEXT_Q_TOOL],
-    tool_choice: { type: "tool", name: "pick_next_question" },
+    // Sonnet 5.5 以降は tool_choice の強制（tool/any）が 400 になるため auto＋指示で呼ばせる
+    tool_choice: { type: "auto" },
     messages: [{
       role: "user",
       content: `筆カード:\n\`\`\`json\n${JSON.stringify(card, null, 2)}\n\`\`\`\n\n直近の判定:\n\`\`\`json\n${JSON.stringify(j, null, 2)}\n\`\`\``,

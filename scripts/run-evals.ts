@@ -214,10 +214,11 @@ function pickToolInput(resp: Anthropic.Message, name: string): Record<string, un
 async function runSeido(client: Anthropic, model: string, c: SeidoCase, useSkills: boolean): Promise<SeidoPred> {
   const resp = await client.messages.create({
     model,
-    max_tokens: 1024,
-    system: useSkills ? SEIDO_SYSTEM_SKILLS : SEIDO_SYSTEM,
+    max_tokens: 8000, // 思考（adaptive）ぶんの余裕
+    system: `${useSkills ? SEIDO_SYSTEM_SKILLS : SEIDO_SYSTEM}\n\n回答は必ず fude_verdict ツールを1回呼んで返す。ツール以外の文章は書かない。`,
     tools: [useSkills ? SEIDO_TOOL_SHARED : SEIDO_TOOL],
-    tool_choice: { type: "tool", name: "fude_verdict" },
+    // Sonnet 5.5 以降は tool_choice の強制（tool/any）が 400 になるため auto＋指示で呼ばせる
+    tool_choice: { type: "auto" },
     messages: [{
       role: "user",
       content: `筆カード:\n\n\`\`\`json\n${JSON.stringify(c.card, null, 2)}\n\`\`\``,
@@ -247,10 +248,11 @@ async function runGuard(client: Anthropic, model: string, c: GuardCase, useSkill
     : "次はアプリがユーザーに返そうとしている出力案です。そのまま出してよいか判定してください。";
   const resp = await client.messages.create({
     model,
-    max_tokens: 600,
-    system: useSkills ? GUARD_SYSTEM_SKILLS : GUARD_SYSTEM,
+    max_tokens: 8000, // 思考（adaptive）ぶんの余裕
+    system: `${useSkills ? GUARD_SYSTEM_SKILLS : GUARD_SYSTEM}\n\n回答は必ず shigyo_decision ツールを1回呼んで返す。ツール以外の文章は書かない。`,
     tools: [useSkills ? GUARD_TOOL_SHARED : GUARD_TOOL],
-    tool_choice: { type: "tool", name: "shigyo_decision" },
+    // Sonnet 5.5 以降は tool_choice の強制（tool/any）が 400 になるため auto＋指示で呼ばせる
+    tool_choice: { type: "auto" },
     messages: [{
       role: "user",
       content: `${header}\n\n---\n${c.input}\n---`,
