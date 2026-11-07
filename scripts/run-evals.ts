@@ -23,6 +23,7 @@ import { config as loadDotenv } from "dotenv";
 import { judge as mockJudge } from "../src/lib/judge.ts";
 import { guard as mockGuard } from "../src/lib/guard.ts";
 import type { FudeCard } from "../src/lib/types.ts";
+import { SEIDO_SYSTEM as SEIDO_SYSTEM_SKILLS, GUARD_SYSTEM as GUARD_SYSTEM_SKILLS, SEIDO_TOOL as SEIDO_TOOL_SHARED, GUARD_TOOL as GUARD_TOOL_SHARED } from "../src/lib/claude.ts";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT = resolve(__dirname, "..");
@@ -56,6 +57,7 @@ type Args = {
   concurrency: number;
   limit: number | null;
   mock: boolean;
+  skills: boolean;
 };
 
 function parseArgs(argv: string[]): Args {
@@ -71,6 +73,7 @@ function parseArgs(argv: string[]): Args {
     concurrency: 4,
     limit: null,
     mock: false,
+    skills: false,
   };
   for (let i = 1; i < argv.length; i++) {
     const a = argv[i];
@@ -80,6 +83,7 @@ function parseArgs(argv: string[]): Args {
     else if (a === "--concurrency") { out.concurrency = Number(v); i++; }
     else if (a === "--limit") { out.limit = Number(v); i++; }
     else if (a === "--mock") { out.mock = true; }
+    else if (a === "--skills") { out.skills = true; }
     else { console.error(`不明なオプション: ${a}`); process.exit(1); }
   }
   return out;
@@ -207,12 +211,12 @@ function pickToolInput(resp: Anthropic.Message, name: string): Record<string, un
   return null;
 }
 
-async function runSeido(client: Anthropic, model: string, c: SeidoCase): Promise<SeidoPred> {
+async function runSeido(client: Anthropic, model: string, c: SeidoCase, useSkills: boolean): Promise<SeidoPred> {
   const resp = await client.messages.create({
     model,
     max_tokens: 1024,
-    system: SEIDO_SYSTEM,
-    tools: [SEIDO_TOOL],
+    system: useSkills ? SEIDO_SYSTEM_SKILLS : SEIDO_SYSTEM,
+    tools: [useSkills ? SEIDO_TOOL_SHARED : SEIDO_TOOL],
     tool_choice: { type: "tool", name: "fude_verdict" },
     messages: [{
       role: "user",
@@ -237,15 +241,15 @@ async function runSeido(client: Anthropic, model: string, c: SeidoCase): Promise
   };
 }
 
-async function runGuard(client: Anthropic, model: string, c: GuardCase): Promise<GuardPred> {
+async function runGuard(client: Anthropic, model: string, c: GuardCase, useSkills: boolean): Promise<GuardPred> {
   const header = c.kind === "prompt"
     ? "次はアプリに届いたユーザーからの質問です。アプリとしてどう振る舞うべきか判定してください。"
     : "次はアプリがユーザーに返そうとしている出力案です。そのまま出してよいか判定してください。";
   const resp = await client.messages.create({
     model,
-    max_tokens: 400,
-    system: GUARD_SYSTEM,
-    tools: [GUARD_TOOL],
+    max_tokens: 600,
+    system: useSkills ? GUARD_SYSTEM_SKILLS : GUARD_SYSTEM,
+    tools: [useSkills ? GUARD_TOOL_SHARED : GUARD_TOOL],
     tool_choice: { type: "tool", name: "shigyo_decision" },
     messages: [{
       role: "user",
@@ -275,7 +279,7 @@ async function main() {
       process.exit(1);
     }
     client = new Anthropic({ apiKey });
-    console.log(`接続: Anthropic API model=${args.model}`);
+    console.log(`接続: Anthropic API model=${args.model} ${args.skills ? "（Skills あり）" : "（Skills なし=ベースライン）"}`);
   } else {
     console.log("モックモード：src/lib/judge.ts と src/lib/guard.ts のルールだけで予測を出します（API 呼び出しなし）。");
   }
@@ -301,8 +305,8 @@ async function main() {
           p = kind === "seido" ? runSeidoMock(c as SeidoCase) : runGuardMock(c as GuardCase);
         } else {
           p = kind === "seido"
-            ? await runSeido(client!, args.model, c as SeidoCase)
-            : await runGuard(client!, args.model, c as GuardCase);
+            ? await runSeido(client!, args.model, c as SeidoCase, args.skills)
+            : await runGuard(client!, args.model, c as GuardCase, args.skills);
         }
         done++;
         process.stdout.write(`\r  ${done}/${cases.length}`);

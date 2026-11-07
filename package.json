@@ -4,18 +4,19 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "next dev -p 3100",
-    "build": "next build",
+    "dev": "npm run skills:bundle && next dev -p 3100",
+    "build": "npm run skills:bundle && next build",
     "start": "next start -p 3100",
     "typecheck": "tsc --noEmit",
     "lint": "next lint",
     "evals": "tsx scripts/run-evals.ts",
     "evals:seido": "tsx scripts/run-evals.ts seido",
     "evals:guard": "tsx scripts/run-evals.ts guard",
+    "skills:bundle": "tsx scripts/bundle-skills.ts",
     "qa": "tsx scripts/qa-screenshots.ts",
-    "cf:build": "opennextjs-cloudflare build",
-    "cf:preview": "opennextjs-cloudflare build && opennextjs-cloudflare preview",
-    "cf:deploy": "opennextjs-cloudflare build && opennextjs-cloudflare deploy"
+    "cf:build": "npm run skills:bundle && opennextjs-cloudflare build",
+    "cf:preview": "npm run cf:build && opennextjs-cloudflare preview",
+    "cf:deploy": "npm run cf:build && opennextjs-cloudflare deploy"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.68.0",
