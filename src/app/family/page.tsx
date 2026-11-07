@@ -6,8 +6,10 @@ import { BrandMark } from "@/components/BrandMark";
 import { DeadlineBar } from "@/components/DeadlineBar";
 import { JudgmentLanes } from "@/components/JudgmentLanes";
 import { FudeCardPanel } from "@/components/FudeCard";
-import type { FudeCard, JudgeResult, NextQuestion } from "@/lib/types";
+import { FamilyIntents } from "@/components/FamilyIntents";
+import type { FudeCard, IntentResolution, JudgeResult, NextQuestion } from "@/lib/types";
 import { LANE_FOR_VERDICT } from "@/lib/types";
+import { getVotes, resolveFude } from "@/lib/intents";
 
 const MapView = dynamic(() => import("@/components/MapView").then((m) => m.MapView), { ssr: false });
 
@@ -18,6 +20,7 @@ export default function FamilyPage() {
   const [geo, setGeo] = useState<GeoJSON.FeatureCollection | null>(null);
   const [activeId, setActiveId] = useState<string | null>(null);
   const [question, setQuestion] = useState<NextQuestion | null>(null);
+  const [intentsTick, setIntentsTick] = useState(0);
 
   useEffect(() => {
     (async () => {
@@ -46,6 +49,22 @@ export default function FamilyPage() {
   }, [items]);
 
   const active = useMemo(() => items.find((x) => x.card.id === activeId) || null, [items, activeId]);
+
+  useEffect(() => {
+    const h = () => setIntentsTick((n) => n + 1);
+    window.addEventListener("fudekoe:intents-changed", h);
+    window.addEventListener("fudekoe:active-member-changed", h);
+    return () => {
+      window.removeEventListener("fudekoe:intents-changed", h);
+      window.removeEventListener("fudekoe:active-member-changed", h);
+    };
+  }, []);
+
+  const intentOf = useCallback<(id: string) => IntentResolution>(
+    (id) => resolveFude(id, getVotes()),
+    // intentsTick を依存に入れて、投票が入るたびに再計算する
+    [intentsTick]
+  );
 
   const verdictOf = useCallback(
     (id: string): "refuse" | "risk" | "wait" | "ok" | "unknown" => {
@@ -129,13 +148,16 @@ export default function FamilyPage() {
             )}
           </div>
           <div className="flex-1 min-h-0">
-            <JudgmentLanes items={items} activeId={activeId} onSelect={selectCard} />
+            <JudgmentLanes items={items} activeId={activeId} onSelect={selectCard} intentOf={intentOf} />
           </div>
         </section>
 
-        <aside className="col-span-5 min-h-0 overflow-y-auto">
+        <aside className="col-span-5 min-h-0 overflow-y-auto space-y-4">
           {active ? (
-            <FudeCardPanel card={active.card} judge={active.judge} question={question} onAnswer={answer} />
+            <>
+              <FudeCardPanel card={active.card} judge={active.judge} question={question} onAnswer={answer} />
+              <FamilyIntents fudeId={active.card.id} yobina={active.card.yobina || active.card.chiban} />
+            </>
           ) : (
             <div className="h-full grid place-items-center text-sumi-400 font-mincho">地図かレーンから一筆を選ぶ</div>
           )}

@@ -64,3 +64,25 @@ export type NextQuestion = {
   choices: [string, string];
   for_fude_id: string;
 };
+
+export const INTENTS = ["残す", "託す", "譲る", "国に返す", "保留"] as const;
+export type Intent = (typeof INTENTS)[number];
+
+export type MemberId = "self" | "ani" | "ane";
+export const MEMBERS: Array<{ id: MemberId; label: string }> = [
+  { id: "self", label: "あなた" },
+  { id: "ani", label: "兄" },
+  { id: "ane", label: "姉" },
+];
+
+export type IntentVote = {
+  member: MemberId;
+  fude_id: string;
+  intent: Intent;
+  at: number;
+};
+
+export type IntentResolution =
+  | { kind: "pending"; submitted: number; total: number }
+  | { kind: "unanimous"; intent: Intent }
+  | { kind: "split"; votes: Array<{ member: MemberId; intent: Intent }> };

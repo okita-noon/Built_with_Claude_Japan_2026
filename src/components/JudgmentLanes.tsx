@@ -1,6 +1,6 @@
 "use client";
 import { motion, AnimatePresence } from "motion/react";
-import type { FudeCard, JudgeResult } from "@/lib/types";
+import type { FudeCard, IntentResolution, JudgeResult } from "@/lib/types";
 import { LANE_FOR_VERDICT } from "@/lib/types";
 import { ChimokuGlyph } from "./BrushGlyph";
 
@@ -15,10 +15,12 @@ export function JudgmentLanes({
   items,
   activeId,
   onSelect,
+  intentOf,
 }: {
   items: Array<{ card: FudeCard; judge: JudgeResult }>;
   activeId: string | null;
   onSelect: (id: string) => void;
+  intentOf?: (id: string) => IntentResolution;
 }) {
   const grouped = LANES.map((l) => ({
     ...l,
@@ -53,6 +55,7 @@ export function JudgmentLanes({
                         {it.card.chiban}
                       </div>
                     </div>
+                    {intentOf && <IntentBadge resolution={intentOf(it.card.id)} active={activeId === it.card.id} />}
                   </div>
                 </motion.button>
               ))}
@@ -61,5 +64,32 @@ export function JudgmentLanes({
         </div>
       ))}
     </div>
+  );
+}
+
+function IntentBadge({ resolution, active }: { resolution: IntentResolution; active: boolean }) {
+  if (resolution.kind === "pending") {
+    return (
+      <span title={`意向 ${resolution.submitted}/${resolution.total}`} className="flex items-center gap-0.5 shrink-0">
+        {Array.from({ length: resolution.total }).map((_, i) => (
+          <span
+            key={i}
+            className={`w-1.5 h-1.5 rounded-full ${i < resolution.submitted ? (active ? "bg-washi" : "bg-sumi-500") : (active ? "bg-sumi-600" : "bg-sumi-200")}`}
+          />
+        ))}
+      </span>
+    );
+  }
+  if (resolution.kind === "unanimous") {
+    return (
+      <span title={`家族一致：${resolution.intent}`} className={`shrink-0 font-fude text-sm ${active ? "text-washi" : "text-matcha"}`}>
+        一
+      </span>
+    );
+  }
+  return (
+    <span title="家族で論点あり" className={`shrink-0 font-fude text-sm ${active ? "text-washi" : "text-beni"}`}>
+      論
+    </span>
   );
 }
