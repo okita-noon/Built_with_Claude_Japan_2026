@@ -44,7 +44,7 @@ function toCSV(office: Office, items: Enriched[]): string {
 const BRINGS: Record<Office, string[]> = {
   forestry: ["固定資産税の課税明細書", "森林の土地の所有者届出書（様式は窓口で入手）", "位置が分かるメモ（林小班・地番）", "家族の意向のメモ"],
   nouchi: ["固定資産税の課税明細書", "農地法3条の3の届出書（様式は窓口で入手）", "耕作者の名前のメモ", "家族の意向のメモ"],
-  shoshi: ["戸籍一式（父・母・子）", "固定資産税の課税明細書", "名寄帳", "相続関係の概略メモ"],
+  shoshi: ["戸籍一式（被相続人・相続人）", "固定資産税の課税明細書", "名寄帳", "相続関係の概略メモ"],
 };
 
 export default function CounterPage() {
@@ -79,7 +79,7 @@ export default function CounterPage() {
         <nav className="flex gap-5 text-sm text-sumi-500">
           <Link href="/" className="hover:text-sumi-900">はじめから</Link>
           <Link href="/family" className="hover:text-sumi-900">家族の画面</Link>
-          <Link href="/mother" className="hover:text-sumi-900">母の画面</Link>
+          <Link href="/parent" className="hover:text-sumi-900">親の画面</Link>
         </nav>
       </header>
 
@@ -107,10 +107,10 @@ export default function CounterPage() {
           <table className="w-full text-sm">
             <thead className="bg-sumi-50 text-sumi-500">
               <tr className="text-left">
-                <th className="px-4 py-3 font-mincho font-normal">地目</th>
-                <th className="px-4 py-3 font-mincho font-normal">地番</th>
+                <th title="地目：田・畑・宅地・山林などの用途区分" className="px-4 py-3 font-mincho font-normal cursor-help">地目</th>
+                <th title="地番：土地ごとに付けられる番号（登記・課税の基本単位）" className="px-4 py-3 font-mincho font-normal cursor-help">地番</th>
                 <th className="px-4 py-3 font-mincho font-normal tabular text-right">面積 m²</th>
-                <th className="px-4 py-3 font-mincho font-normal">判定</th>
+                <th title="国庫帰属（相続土地を国に引き取ってもらう制度）の判定区分" className="px-4 py-3 font-mincho font-normal cursor-help">判定</th>
                 {office === "forestry" && <th className="px-4 py-3 font-mincho font-normal">手入れ</th>}
                 {office === "nouchi" && <th className="px-4 py-3 font-mincho font-normal">他人の使用</th>}
                 {office === "shoshi" && <th className="px-4 py-3 font-mincho font-normal">名義</th>}

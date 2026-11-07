@@ -21,7 +21,7 @@ export type FudeCard = {
   recurring_charges: string;
   position?: "confirmed" | "unresolved";
   evidence?: Record<string, { value: string; confidence: number; source: string }>;
-  haha_shogen?: string;
+  shogen?: string;
 };
 
 export const VERDICTS = [

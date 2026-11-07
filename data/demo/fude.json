@@ -6,12 +6,12 @@
     "toki_chimoku": "畑",
     "genkyo": "畑（休耕・草刈りのみ）",
     "menseki_m2": 820,
-    "meigi": "父",
+    "meigi": "父（被相続人）",
     "shutoku": "相続",
     "hisouzokunin_shibou": "2019-06-10",
     "building": "無",
     "structures": [],
-    "boundary": "母の証言のみ（栗の木まで）",
+    "boundary": "親の証言のみ（栗の木まで）",
     "others_use": "無",
     "rights": "無",
     "cliff": "無",
@@ -22,9 +22,9 @@
     "recurring_charges": "無",
     "position": "confirmed",
     "evidence": {
-      "boundary": { "value": "母の証言のみ", "confidence": 0.4, "source": "shogen" }
+      "boundary": { "value": "親の証言のみ", "confidence": 0.4, "source": "shogen" }
     },
-    "haha_shogen": "栗の木のとこまでがうち。隣とはもめたことない"
+    "shogen": "栗の木のとこまでがうち。隣とはもめたことない"
   },
   {
     "id": "D002",
@@ -33,7 +33,7 @@
     "toki_chimoku": "畑",
     "genkyo": "畑（耕作なし）",
     "menseki_m2": 540,
-    "meigi": "父",
+    "meigi": "父（被相続人）",
     "shutoku": "相続",
     "hisouzokunin_shibou": "2019-06-10",
     "building": "無",
@@ -49,7 +49,7 @@
     "recurring_charges": "無",
     "position": "unresolved",
     "evidence": {},
-    "haha_shogen": ""
+    "shogen": ""
   },
   {
     "id": "D003",
@@ -58,7 +58,7 @@
     "toki_chimoku": "宅地",
     "genkyo": "宅地（空き家の母屋あり）",
     "menseki_m2": 450,
-    "meigi": "父",
+    "meigi": "父（被相続人）",
     "shutoku": "相続",
     "hisouzokunin_shibou": "2019-06-10",
     "building": "有（木造平屋・登記あり）",
@@ -74,7 +74,7 @@
     "recurring_charges": "無",
     "position": "confirmed",
     "evidence": {},
-    "haha_shogen": "お父さんが建てた家。もう誰も住んでない"
+    "shogen": "お父さんが建てた家。もう誰も住んでない"
   },
   {
     "id": "D004",
@@ -83,7 +83,7 @@
     "toki_chimoku": "山林",
     "genkyo": "山林（スギ人工林・間伐なし）",
     "menseki_m2": 12000,
-    "meigi": "父",
+    "meigi": "父（被相続人）",
     "shutoku": "相続",
     "hisouzokunin_shibou": "2019-06-10",
     "building": "無",
@@ -99,7 +99,7 @@
     "recurring_charges": "無",
     "position": "confirmed",
     "evidence": {},
-    "haha_shogen": "お父さんが若い頃に植えて、それっきり"
+    "shogen": "お父さんが若い頃に植えて、それっきり"
   },
   {
     "id": "D005",
@@ -108,7 +108,7 @@
     "toki_chimoku": "田",
     "genkyo": "田（近所の人が耕作）",
     "menseki_m2": 1100,
-    "meigi": "父",
+    "meigi": "父（被相続人）",
     "shutoku": "相続",
     "hisouzokunin_shibou": "2019-06-10",
     "building": "無",
@@ -124,7 +124,7 @@
     "recurring_charges": "無",
     "position": "confirmed",
     "evidence": {},
-    "haha_shogen": "佐藤さんがずっと作ってくれとる"
+    "shogen": "佐藤さんがずっと作ってくれとる"
   },
   {
     "id": "D006",
@@ -133,7 +133,7 @@
     "toki_chimoku": "山林",
     "genkyo": "山林（雑木林）",
     "menseki_m2": 8600,
-    "meigi": "父",
+    "meigi": "父（被相続人）",
     "shutoku": "相続",
     "hisouzokunin_shibou": "2019-06-10",
     "building": "無",
@@ -149,7 +149,7 @@
     "recurring_charges": "無",
     "position": "confirmed",
     "evidence": {},
-    "haha_shogen": "下のほうが崩れたことがあったよ"
+    "shogen": "下のほうが崩れたことがあったよ"
   },
   {
     "id": "D007",
@@ -158,7 +158,7 @@
     "toki_chimoku": "畑",
     "genkyo": "畑＋倉庫",
     "menseki_m2": 600,
-    "meigi": "父",
+    "meigi": "父（被相続人）",
     "shutoku": "相続",
     "hisouzokunin_shibou": "2019-06-10",
     "building": "有（コンクリート基礎・屋根と壁のある木造倉庫・未登記）",
@@ -174,7 +174,7 @@
     "recurring_charges": "無",
     "position": "confirmed",
     "evidence": {},
-    "haha_shogen": "農機具を入れとる小屋がある"
+    "shogen": "農機具を入れとる小屋がある"
   },
   {
     "id": "D008",
@@ -183,7 +183,7 @@
     "toki_chimoku": "山林",
     "genkyo": "山林（ヒノキ人工林・直近10年で間伐済）",
     "menseki_m2": 15400,
-    "meigi": "父",
+    "meigi": "父（被相続人）",
     "shutoku": "相続",
     "hisouzokunin_shibou": "2019-06-10",
     "building": "無",
@@ -199,7 +199,7 @@
     "recurring_charges": "無",
     "position": "confirmed",
     "evidence": {},
-    "haha_shogen": "ヒノキのほうは、組合に頼んで何年か前にやってもろた"
+    "shogen": "ヒノキのほうは、組合に頼んで何年か前にやってもろた"
   },
   {
     "id": "D009",
@@ -208,7 +208,7 @@
     "toki_chimoku": "田",
     "genkyo": "田（休耕・畦あり）",
     "menseki_m2": 980,
-    "meigi": "父",
+    "meigi": "父（被相続人）",
     "shutoku": "相続",
     "hisouzokunin_shibou": "2019-06-10",
     "building": "無",
@@ -224,7 +224,7 @@
     "recurring_charges": "無",
     "position": "confirmed",
     "evidence": {},
-    "haha_shogen": "むかしは米、いまは何も作っとらん"
+    "shogen": "むかしは米、いまは何も作っとらん"
   },
   {
     "id": "D010",
@@ -249,6 +249,6 @@
     "recurring_charges": "不明",
     "position": "unresolved",
     "evidence": {},
-    "haha_shogen": "ずっとおくに、お父さんのお父さんの代の畑がもう一つあったような気がする"
+    "shogen": "ずっとおくに、お父さんのお父さんの代の畑がもう一つあったような気がする"
   }
 ]

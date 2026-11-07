@@ -28,7 +28,7 @@ const PROMPT_RULES: Rule[] = [
 ];
 
 const OUTPUT_RULES: Rule[] = [
-  { match: /境界は.*です[。．]?$/, decision: "rewrite", rewrite: "お母さんの証言では、境は◯◯のあたり（参考情報）。確定には土地家屋調査士への相談が必要です。", tag: "boundary_assert" },
+  { match: /境界は.*です[。．]?$/, decision: "rewrite", rewrite: "ご本人の証言では、境は◯◯のあたり（参考情報）。確定には土地家屋調査士への相談が必要です。", tag: "boundary_assert" },
   { match: /承認されます|引き取ってもらえます|引き取ってくれます/, decision: "rewrite", rewrite: "却下事由は今のところ見当たりません。最終判断は法務局の審査です。", tag: "guarantee" },
   { match: /申請書の記入例|申請者：.*所在/, decision: "rewrite", rewrite: "申請書の作成は司法書士・行政書士・弁護士に依頼できます。持参するもの：固定資産税の課税明細書、戸籍など。", tag: "docs" },
   { match: /公平です|分け方.*(最も|公平)/, decision: "rewrite", rewrite: "分け方は家族で決めること。論点整理は手伝えますが、助言は弁護士へ。", tag: "partition" },

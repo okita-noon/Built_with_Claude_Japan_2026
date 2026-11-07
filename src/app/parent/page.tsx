@@ -6,7 +6,7 @@ import type { FudeCard, NextQuestion } from "@/lib/types";
 
 type Enriched = { card: FudeCard; judge: { verdict: string } };
 
-export default function MotherPage() {
+export default function ParentPage() {
   const [card, setCard] = useState<FudeCard | null>(null);
   const [question, setQuestion] = useState<NextQuestion | null>(null);
   const [speaking, setSpeaking] = useState(false);
@@ -54,7 +54,7 @@ export default function MotherPage() {
           <div className="font-fude text-4xl text-sumi-900">{name}</div>
         </div>
 
-        {/* 二択の質問。母には1問だけ、大きく */}
+        {/* 二択の質問。親には1問だけ、大きく */}
         <AnimatePresence>
           {question && (
             <motion.div

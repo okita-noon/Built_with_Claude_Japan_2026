@@ -12,11 +12,13 @@
     "evals": "tsx scripts/run-evals.ts",
     "evals:seido": "tsx scripts/run-evals.ts seido",
     "evals:guard": "tsx scripts/run-evals.ts guard",
-    "qa": "tsx scripts/qa-screenshots.ts"
+    "qa": "tsx scripts/qa-screenshots.ts",
+    "cf:build": "opennextjs-cloudflare build",
+    "cf:preview": "opennextjs-cloudflare build && opennextjs-cloudflare preview",
+    "cf:deploy": "opennextjs-cloudflare build && opennextjs-cloudflare deploy"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.68.0",
-    "@anthropic-ai/vertex-sdk": "^0.13.0",
     "dotenv": "^16.4.5",
     "maplibre-gl": "^4.7.1",
     "motion": "^11.11.17",
@@ -26,6 +28,7 @@
     "react-dom": "^18.3.1"
   },
   "devDependencies": {
+    "@opennextjs/cloudflare": "^1.20.16",
     "@playwright/test": "^1.48.2",
     "@types/node": "^22.9.0",
     "@types/react": "^18.3.12",
@@ -34,6 +37,7 @@
     "postcss": "^8.4.49",
     "tailwindcss": "^3.4.14",
     "tsx": "^4.19.2",
-    "typescript": "^5.6.3"
+    "typescript": "^5.6.3",
+    "wrangler": "^4.158.0"
   }
 }

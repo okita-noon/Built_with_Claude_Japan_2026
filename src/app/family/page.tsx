@@ -57,12 +57,12 @@ export default function FamilyPage() {
 
   const answer = useCallback(async (choice: 0 | 1) => {
     if (!active || !question) return;
-    // 母の答えで該当項目を埋める。簡易：choice=0 なら「有」寄り、=1 なら「無」寄り
+    // 親の答えで該当項目を埋める。簡易：choice=0 なら「有」寄り、=1 なら「無」寄り
     const updated: FudeCard = { ...active.card };
     const yes = choice === 0;
     switch (question.code) {
       case "Q_BOUNDARY":
-        updated.boundary = yes ? "隣地と確認済・境界杭あり" : "母の証言のみ（栗の木まで）";
+        updated.boundary = yes ? "隣地と確認済・境界杭あり" : "親の証言のみ（栗の木まで）";
         break;
       case "Q_BUILDING":
         updated.building = yes ? "有（屋根と壁あり・未登記）" : "無";
@@ -110,7 +110,7 @@ export default function FamilyPage() {
         <BrandMark size="sm" />
         <nav className="flex gap-5 text-sm text-sumi-500">
           <Link href="/" className="hover:text-sumi-900">はじめから</Link>
-          <Link href="/mother" className="hover:text-sumi-900">母の画面</Link>
+          <Link href="/parent" className="hover:text-sumi-900">親の画面</Link>
           <Link href="/counter" className="hover:text-sumi-900">窓口の画面</Link>
         </nav>
       </header>

@@ -25,7 +25,7 @@ const body = Noto_Sans_JP({
 
 export const metadata: Metadata = {
   title: "筆のこえ",
-  description: "母の記憶から土地を一筆ずつ棚卸し、家族と窓口のあいだをつなぐ。",
+  description: "親の記憶から土地を一筆ずつ棚卸し、家族と窓口のあいだをつなぐ。",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

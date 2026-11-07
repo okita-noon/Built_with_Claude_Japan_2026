@@ -5,12 +5,12 @@
   "required": ["chiban", "toki_chimoku", "genkyo", "meigi", "shutoku"],
   "properties": {
     "chiban": { "type": "string", "description": "所在と地番" },
-    "yobina": { "type": "string", "description": "母の呼び名（例：沢の上の田んぼ）" },
+    "yobina": { "type": "string", "description": "親の呼び名（例：沢の上の田んぼ）" },
     "toki_chimoku": { "type": "string", "description": "登記の地目" },
     "genkyo": { "type": "string", "description": "現況" },
     "menseki_m2": { "type": ["number", "null"] },
     "meigi": { "type": "string", "description": "登記名義人" },
-    "shutoku": { "type": "string", "description": "母の取得原因（相続／売買／未確定など）" },
+    "shutoku": { "type": "string", "description": "親の取得原因（相続／売買／未確定など）" },
     "hisouzokunin_shibou": { "type": ["string", "null"], "format": "date" },
     "building": { "type": "string" },
     "structures": { "type": "array", "items": { "type": "string" } },
@@ -23,7 +23,7 @@
     "disaster": { "type": "string" },
     "neighbor_trouble": { "type": "string" },
     "recurring_charges": { "type": "string" },
-    "haha_shogen": { "type": "string", "description": "母の言葉そのまま" },
+    "shogen": { "type": "string", "description": "親の言葉そのまま" },
     "evidence": {
       "type": "array",
       "description": "各項目の出どころ。値は『不明』を正式に持てる",
@@ -32,7 +32,7 @@
         "required": ["field", "source"],
         "properties": {
           "field": { "type": "string" },
-          "source": { "enum": ["母の証言", "課税明細書", "登記", "公開地図", "航空写真", "家族", "不明"] },
+          "source": { "enum": ["親の証言", "課税明細書", "登記", "公開地図", "航空写真", "家族", "不明"] },
           "recorded_at": { "type": "string", "format": "date-time" },
           "audio_ref": { "type": "string" }
         }

@@ -10,3 +10,7 @@ runs/*.jsonl
 tsconfig.tsbuildinfo
 # .next build cache
 .next/
+
+# Cloudflare Workers / OpenNext ビルド成果物
+.open-next/
+.wrangler/

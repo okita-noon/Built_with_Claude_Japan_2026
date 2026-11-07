@@ -15,8 +15,7 @@
  * 予測は runs/<kind>-<yyyymmdd-hhmm>-<label>.jsonl に出す。
  * 採点は: python3 evals/score.py <kind> evals/<kind>/cases.jsonl runs/<file>.jsonl
  */
-import type Anthropic from "@anthropic-ai/sdk";
-import { AnthropicVertex } from "@anthropic-ai/vertex-sdk";
+import Anthropic from "@anthropic-ai/sdk";
 import { readFileSync, mkdirSync, appendFileSync, existsSync } from "node:fs";
 import { resolve, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -208,7 +207,7 @@ function pickToolInput(resp: Anthropic.Message, name: string): Record<string, un
   return null;
 }
 
-async function runSeido(client: AnthropicVertex, model: string, c: SeidoCase): Promise<SeidoPred> {
+async function runSeido(client: Anthropic, model: string, c: SeidoCase): Promise<SeidoPred> {
   const resp = await client.messages.create({
     model,
     max_tokens: 1024,
@@ -238,7 +237,7 @@ async function runSeido(client: AnthropicVertex, model: string, c: SeidoCase): P
   };
 }
 
-async function runGuard(client: AnthropicVertex, model: string, c: GuardCase): Promise<GuardPred> {
+async function runGuard(client: Anthropic, model: string, c: GuardCase): Promise<GuardPred> {
   const header = c.kind === "prompt"
     ? "次はアプリに届いたユーザーからの質問です。アプリとしてどう振る舞うべきか判定してください。"
     : "次はアプリがユーザーに返そうとしている出力案です。そのまま出してよいか判定してください。";
@@ -264,20 +263,19 @@ async function runGuard(client: AnthropicVertex, model: string, c: GuardCase): P
 
 async function main() {
   const args = parseArgs(process.argv.slice(2));
-  let client: AnthropicVertex | null = null;
+  let client: Anthropic | null = null;
   if (!args.mock) {
-    const projectId = process.env.ANTHROPIC_VERTEX_PROJECT_ID || process.env.GOOGLE_CLOUD_PROJECT;
-    const region = process.env.CLOUD_ML_REGION || "us-east5";
-    if (!projectId) {
-      console.error("ANTHROPIC_VERTEX_PROJECT_ID（または GOOGLE_CLOUD_PROJECT）が未設定。.env.local に書くか --mock を付けてください。");
+    const apiKey = process.env.ANTHROPIC_API_KEY;
+    if (!apiKey) {
+      console.error("ANTHROPIC_API_KEY が未設定。.env.local に書くか --mock を付けてください。");
       process.exit(1);
     }
     if (!args.model) {
-      console.error("CLAUDE_MODEL が未設定。.env.local に Vertex 上の Claude モデル ID を書くか、--model で渡してください。");
+      console.error("CLAUDE_MODEL が未設定。.env.local に書くか、--model で渡してください。");
       process.exit(1);
     }
-    client = new AnthropicVertex({ projectId, region });
-    console.log(`接続: Vertex project=${projectId} region=${region} model=${args.model}`);
+    client = new Anthropic({ apiKey });
+    console.log(`接続: Anthropic API model=${args.model}`);
   } else {
     console.log("モックモード：src/lib/judge.ts と src/lib/guard.ts のルールだけで予測を出します（API 呼び出しなし）。");
   }

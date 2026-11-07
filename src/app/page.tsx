@@ -33,7 +33,7 @@ export default function Onboarding() {
         <BrandMark size="md" />
         <nav className="flex gap-5 text-sm text-sumi-500">
           <Link href="/family" className="hover:text-sumi-900">家族の画面</Link>
-          <Link href="/mother" className="hover:text-sumi-900">母の画面</Link>
+          <Link href="/parent" className="hover:text-sumi-900">親の画面</Link>
           <Link href="/counter" className="hover:text-sumi-900">窓口の画面</Link>
         </nav>
       </header>
@@ -49,9 +49,9 @@ export default function Onboarding() {
               transition={{ duration: 0.32, ease: [0.22, 1, 0.36, 1] }}
               className="pt-20"
             >
-              <h1 className="font-fude text-5xl text-sumi-900 leading-tight">実家の町名を、ひとつだけ</h1>
+              <h1 className="font-fude text-5xl text-sumi-900 leading-tight">親の町名を、ひとつだけ</h1>
               <p className="font-mincho text-sumi-600 mt-6 text-base max-w-xl">
-                母の記憶から土地を一筆ずつ棚卸しし、家族が「残す／託す／譲る／国に返す／保留」を決めて窓口へ持っていけるようにします。
+                親の記憶から土地を一筆ずつ棚卸しし、家族が「残す／託す／譲る／国に返す／保留」を決めて窓口へ持っていけるようにします。
               </p>
               <div className="mt-10 flex gap-3 items-stretch max-w-xl">
                 <input
@@ -124,7 +124,7 @@ export default function Onboarding() {
               {step === "list" && (
                 <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }} className="mt-14 flex items-center justify-between">
                   <div>
-                    <h3 className="font-fude text-2xl text-sumi-900">まずお母さんに聞きたい場所を1つ</h3>
+                    <h3 className="font-fude text-2xl text-sumi-900">まず親に聞きたい場所を1つ</h3>
                     <p className="font-mincho text-sumi-500 text-sm mt-2">家族の画面で地図から選び、聞き直しを始めます。</p>
                   </div>
                   <Link href="/family" className="px-7 py-4 rounded-md bg-sumi-900 text-washi font-mincho text-lg hover:bg-sumi-800">

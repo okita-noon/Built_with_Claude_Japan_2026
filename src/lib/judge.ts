@@ -83,7 +83,7 @@ function buildText(v: Verdict, rs: string[], as: string[], c: FudeCard): string 
   }
   if (v === "判断に必要な情報が足りない") {
     const q = as.slice(0, 2).map(askHuman).join("、");
-    return `${name}は、${q}が分かれば判定できる。母に聞き直す。`;
+    return `${name}は、${q}が分かれば判定できる。親に聞き直す。`;
   }
   return `${name}は、要件のうち確認できた項目では問題は見当たらない。最終判断は法務局の審査。`;
 }

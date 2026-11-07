@@ -53,9 +53,9 @@ export function FudeCardPanel({
         </div>
       </div>
 
-      {card.haha_shogen ? (
+      {card.shogen ? (
         <blockquote className="mt-4 font-mincho text-sumi-700 text-sm border-l-2 border-sumi-300 pl-3">
-          「{card.haha_shogen}」
+          「{card.shogen}」
         </blockquote>
       ) : null}
 
@@ -91,7 +91,7 @@ export function FudeCardPanel({
         >
           <div className="flex items-center gap-2 text-sumi-600">
             <BrushAsk size={18} />
-            <span className="font-mincho text-sm">母に聞き直す</span>
+            <span className="font-mincho text-sm">親に聞き直す</span>
           </div>
           <p className="font-fude text-xl text-sumi-900 mt-2 leading-snug">{question.prompt}</p>
           <div className="mt-4 grid grid-cols-2 gap-3">

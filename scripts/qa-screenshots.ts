@@ -62,11 +62,11 @@ async function run(browser: Browser) {
     console.log("(no 聞き直し on initial fude — skipping)");
   }
 
-  // 3. 母の画面
-  await page.goto(`${BASE}/mother`, { waitUntil: "networkidle" });
+  // 3. 親の画面
+  await page.goto(`${BASE}/parent`, { waitUntil: "networkidle" });
   await waitFonts(page);
   await page.waitForTimeout(800);
-  await shot(page, "06-mother");
+  await shot(page, "06-parent");
 
   // 4. 窓口の画面
   await page.goto(`${BASE}/counter`, { waitUntil: "networkidle" });
