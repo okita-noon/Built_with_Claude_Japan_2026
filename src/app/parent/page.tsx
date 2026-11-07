@@ -1,8 +1,11 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import Link from "next/link";
 import type { FudeCard, NextQuestion } from "@/lib/types";
+import type { JevTagResult } from "@/lib/jev";
+import { DEMO_TRANSCRIPTS } from "@/lib/transcripts";
+import { publish, subscribe } from "@/lib/bridge";
 
 type Enriched = { card: FudeCard; judge: { verdict: string } };
 
@@ -10,6 +13,10 @@ export default function ParentPage() {
   const [card, setCard] = useState<FudeCard | null>(null);
   const [question, setQuestion] = useState<NextQuestion | null>(null);
   const [speaking, setSpeaking] = useState(false);
+  const [currentChunk, setCurrentChunk] = useState<string | null>(null);
+  const [playingId, setPlayingId] = useState<string | null>(null);
+  const [geminiReady, setGeminiReady] = useState<"unknown" | "ready" | "fallback">("unknown");
+  const stopRef = useRef<{ stopped: boolean }>({ stopped: false });
 
   useEffect(() => {
     (async () => {
@@ -25,7 +32,65 @@ export default function ParentPage() {
       const qj = (await q.json()) as { question: NextQuestion | null };
       setQuestion(qj.question);
     })();
+
+    // Gemini トークン可否を確認（鍵なしなら 501 → fallback）
+    (async () => {
+      try {
+        const r = await fetch("/api/gemini/token", { method: "POST" });
+        setGeminiReady(r.ok ? "ready" : "fallback");
+      } catch {
+        setGeminiReady("fallback");
+      }
+    })();
+
+    // 家族の画面から「次の質問を親に読み上げて」の指示を受け取る
+    const unsub = subscribe((ev) => {
+      if (ev.type === "say") {
+        try {
+          const u = new SpeechSynthesisUtterance(ev.message);
+          u.lang = "ja-JP";
+          u.rate = 0.95;
+          window.speechSynthesis.cancel();
+          window.speechSynthesis.speak(u);
+        } catch {}
+      }
+    });
+    return () => {
+      unsub();
+      stopRef.current.stopped = true;
+    };
   }, []);
+
+  async function playTranscript(id: string) {
+    if (playingId) return;
+    const t = DEMO_TRANSCRIPTS.find((x) => x.id === id);
+    if (!t) return;
+    setPlayingId(id);
+    setSpeaking(true);
+    stopRef.current = { stopped: false };
+    publish({ type: "focus", yobina: t.yobina, at: Date.now() });
+    for (const chunk of t.chunks) {
+      if (stopRef.current.stopped) break;
+      setCurrentChunk(chunk.text);
+      publish({ type: "transcript", text: chunk.text, at: Date.now() });
+      try {
+        const r = await fetch("/api/jev/tag", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ text: chunk.text }),
+        });
+        const result = (await r.json()) as JevTagResult;
+        publish({ type: "tag", text: chunk.text, result, at: Date.now() });
+        if (result.score >= 70) {
+          publish({ type: "fatigue", score: result.score, at: Date.now() });
+        }
+      } catch {}
+      await new Promise((rs) => setTimeout(rs, chunk.delay_ms ?? 1200));
+    }
+    setSpeaking(false);
+    setCurrentChunk(null);
+    setPlayingId(null);
+  }
 
   if (!card) return <div className="min-h-screen grid place-items-center font-mincho text-sumi-500">読み込み中</div>;
 
@@ -33,7 +98,7 @@ export default function ParentPage() {
 
   return (
     <main className="min-h-screen grid place-items-center px-6 py-10">
-      <div className="w-full max-w-2xl flex flex-col items-center gap-10">
+      <div className="w-full max-w-2xl flex flex-col items-center gap-8">
         {/* 写真1枚（代替：SVGでその場所を描く）*/}
         <div className="w-full aspect-[4/3] rounded-md overflow-hidden stroke-edge bg-sumi-50 border border-sumi-200">
           <svg viewBox="0 0 400 300" className="w-full h-full">
@@ -56,7 +121,7 @@ export default function ParentPage() {
 
         {/* 二択の質問。親には1問だけ、大きく */}
         <AnimatePresence>
-          {question && (
+          {question && !currentChunk && (
             <motion.div
               key={question.code}
               initial={{ y: 20, opacity: 0 }}
@@ -68,9 +133,20 @@ export default function ParentPage() {
               <p className="font-fude text-3xl text-sumi-900 leading-snug">{question.prompt}</p>
             </motion.div>
           )}
+          {currentChunk && (
+            <motion.p
+              key={currentChunk}
+              initial={{ y: 8, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              exit={{ y: -8, opacity: 0 }}
+              className="font-fude text-2xl text-sumi-700 text-center leading-snug"
+            >
+              「{currentChunk}」
+            </motion.p>
+          )}
         </AnimatePresence>
 
-        {/* 話すボタン：声に合わせて輪が膨らむ想定（デモはクリックで膨らむ） */}
+        {/* 話すボタン */}
         <div className="relative">
           <AnimatePresence>
             {speaking && (
@@ -94,6 +170,31 @@ export default function ParentPage() {
           >
             話す
           </button>
+        </div>
+
+        {/* デモ発話：キャンドtranscriptを選んで流す（Gemini Liveの代替） */}
+        <div className="w-full">
+          <div className="text-xs font-mincho text-sumi-400 text-center mb-2">
+            {geminiReady === "ready"
+              ? "Gemini Live に接続できます（デモ発話はキャンドを使用）"
+              : "Gemini Live 未接続。キャンドのデモ発話を流す："}
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+            {DEMO_TRANSCRIPTS.map((t) => (
+              <button
+                key={t.id}
+                disabled={Boolean(playingId) && playingId !== t.id}
+                onClick={() => playTranscript(t.id)}
+                className={`px-3 py-2 rounded-md font-mincho text-sm border transition-colors ${
+                  playingId === t.id
+                    ? "bg-sumi-900 text-washi border-sumi-900"
+                    : "bg-washi text-sumi-700 border-sumi-300 hover:bg-sumi-50 disabled:opacity-30"
+                }`}
+              >
+                {t.title}
+              </button>
+            ))}
+          </div>
         </div>
 
         <Link href="/family" className="text-sm font-mincho text-sumi-400 hover:text-sumi-700">

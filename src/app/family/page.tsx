@@ -10,6 +10,8 @@ import { FamilyIntents } from "@/components/FamilyIntents";
 import type { FudeCard, IntentResolution, JudgeResult, NextQuestion } from "@/lib/types";
 import { LANE_FOR_VERDICT } from "@/lib/types";
 import { getVotes, resolveFude } from "@/lib/intents";
+import { publish, subscribe, type BridgeEvent } from "@/lib/bridge";
+import { nouToFudePatch } from "@/lib/jev";
 
 const MapView = dynamic(() => import("@/components/MapView").then((m) => m.MapView), { ssr: false });
 
@@ -21,6 +23,8 @@ export default function FamilyPage() {
   const [activeId, setActiveId] = useState<string | null>(null);
   const [question, setQuestion] = useState<NextQuestion | null>(null);
   const [intentsTick, setIntentsTick] = useState(0);
+  const [liveTranscript, setLiveTranscript] = useState<string | null>(null);
+  const [fatigue, setFatigue] = useState<number | null>(null);
 
   useEffect(() => {
     (async () => {
@@ -73,6 +77,78 @@ export default function FamilyPage() {
     },
     [items]
   );
+
+  // 親画面からの transcript / tag / focus を受け取る
+  useEffect(() => {
+    const unsub = subscribe((ev: BridgeEvent) => {
+      if (ev.type === "transcript") {
+        setLiveTranscript(ev.text);
+      }
+      if (ev.type === "fatigue") {
+        setFatigue(ev.score);
+        setTimeout(() => setFatigue((v) => (v === ev.score ? null : v)), 6000);
+      }
+      if (ev.type === "focus") {
+        // yobina が一致する筆を active にする
+        setItems((cur) => {
+          const match = cur.find((x) => x.card.yobina === ev.yobina);
+          if (match) {
+            setActiveId(match.card.id);
+            fetch("/api/next-question", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ card: match.card }),
+            }).then((r) => r.json()).then((j: { question: NextQuestion | null }) => setQuestion(j.question));
+          }
+          return cur;
+        });
+      }
+      if (ev.type === "tag") {
+        const patch = nouToFudePatch(ev.result.noul);
+        if (Object.keys(patch).length === 0) return;
+        setItems((cur) => {
+          const idx = cur.findIndex((x) => x.card.yobina === ev.result.choice || x.card.id === activeId);
+          if (idx < 0) return cur;
+          const base = cur[idx].card;
+          const updated: FudeCard = { ...base, ...patch, shogen: (base.shogen ? base.shogen + " " : "") + ev.text };
+          const next = cur.slice();
+          next[idx] = { ...cur[idx], card: updated };
+          // 判定を更新
+          fetch("/api/judge", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ card: updated }),
+          })
+            .then((r) => r.json())
+            .then((nj: JudgeResult) => {
+              setItems((cur2) => {
+                const idx2 = cur2.findIndex((x) => x.card.id === updated.id);
+                if (idx2 < 0) return cur2;
+                const n2 = cur2.slice();
+                n2[idx2] = { card: updated, judge: nj };
+                return n2;
+              });
+              if (updated.id === activeId) {
+                fetch("/api/next-question", {
+                  method: "POST",
+                  headers: { "Content-Type": "application/json" },
+                  body: JSON.stringify({ card: updated }),
+                })
+                  .then((r) => r.json())
+                  .then((j: { question: NextQuestion | null }) => setQuestion(j.question));
+              }
+            });
+          return next;
+        });
+      }
+    });
+    return unsub;
+  }, [activeId]);
+
+  // 親に読み上げを依頼する
+  const sayToParent = useCallback((msg: string) => {
+    publish({ type: "say", message: msg, at: Date.now() });
+  }, []);
 
   const answer = useCallback(async (choice: 0 | 1) => {
     if (!active || !question) return;
@@ -134,9 +210,38 @@ export default function FamilyPage() {
         </nav>
       </header>
 
-      <div className="mb-4">
-        <DeadlineBar />
+      <div className="mb-4 flex items-stretch gap-3">
+        <div className="flex-1">
+          <DeadlineBar />
+        </div>
+        {question && (
+          <button
+            onClick={() => sayToParent(question.prompt)}
+            className="px-4 py-2 rounded-md bg-washi border border-sumi-300 text-sumi-700 font-mincho text-sm hover:bg-sumi-50"
+            title="親の画面に音声で読み上げを依頼"
+          >
+            親に読み上げる
+          </button>
+        )}
       </div>
+
+      {(liveTranscript || fatigue !== null) && (
+        <div className="mb-4 flex items-start gap-3">
+          {liveTranscript && (
+            <div className="flex-1 bg-washi border border-sumi-300 rounded-md px-4 py-3 stroke-edge">
+              <div className="text-xs font-mincho text-sumi-400">親の発話（Live）</div>
+              <div className="font-fude text-lg text-sumi-900 leading-snug mt-1">「{liveTranscript}」</div>
+            </div>
+          )}
+          {fatigue !== null && (
+            <div className="bg-beni/10 border border-beni/30 rounded-md px-4 py-3 w-56">
+              <div className="text-xs font-mincho text-beni">親の疲れ</div>
+              <div className="font-fude text-xl text-beni leading-snug mt-1">少し休んでもらう</div>
+              <div className="text-xs font-mincho text-sumi-500 mt-1">score {fatigue}</div>
+            </div>
+          )}
+        </div>
+      )}
 
       <div className="grid grid-cols-12 gap-4" style={{ height: "calc(100vh - 180px)" }}>
         <section className="col-span-7 flex flex-col gap-4 min-h-0">
