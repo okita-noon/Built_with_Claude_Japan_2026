@@ -60,7 +60,7 @@ export function FudeCardPanel({
       ) : null}
 
       {/* 必須項目のマス：埋まったら塗られる（文字ラベルは左端1回のみ） */}
-      <div className="mt-5 grid grid-cols-10 gap-1.5">
+      <div data-shogen-grid className="mt-5 grid grid-cols-10 gap-1.5">
         {list.map((c) => (
           <motion.div
             key={c.key}
@@ -93,7 +93,7 @@ export function FudeCardPanel({
             <BrushAsk size={18} />
             <span className="font-mincho text-sm">親に聞き直す</span>
           </div>
-          <p className="font-fude text-xl text-sumi-900 mt-2 leading-snug">{question.prompt}</p>
+          <p className="font-body font-bold text-xl text-sumi-900 mt-2 leading-snug">{question.prompt}</p>
           <div className="mt-4 grid grid-cols-2 gap-3">
             <button onClick={() => onAnswer(0)} className="py-4 px-5 rounded-md bg-sumi-900 text-washi font-mincho hover:bg-sumi-800">
               {question.choices[0]}

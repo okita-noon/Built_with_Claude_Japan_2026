@@ -169,6 +169,19 @@ async function main() {
   await sleep(dur[`ask-q-${ask.key}`] + 0.7);
   say(`ask-a-${ask.key}.wav`, 0);
   await sleep(dur[`ask-a-${ask.key}`] + 0.2);
+  // マス（必須10項目）を強調してから答える。動画用の一時的な装飾で、アプリには入れない
+  await family.evaluate(() => {
+    const g = document.querySelector("[data-shogen-grid]") as HTMLElement | null;
+    if (!g) return;
+    g.style.outline = "4px solid #a0352c";
+    g.style.outlineOffset = "8px";
+    g.style.borderRadius = "4px";
+    g.insertAdjacentHTML(
+      "beforebegin",
+      '<div id="__tip" style="margin-top:18px;font:700 17px \'Noto Sans JP\',sans-serif;color:#a0352c">確認が必要な10項目　━　聞けた項目は黒く埋まる</div>'
+    );
+  });
+  await sleep(1.0);
   await family.getByRole("button", { name: ask.choice }).click();
   await sleep(0.5);
   cut();
@@ -179,6 +192,12 @@ async function main() {
   say("09b-ask.wav", 0.1);
   await sleep(narr("09b-ask") + 0.6);
   cut();
+
+  await family.evaluate(() => {
+    document.getElementById("__tip")?.remove();
+    const g = document.querySelector("[data-shogen-grid]") as HTMLElement | null;
+    if (g) g.style.outline = "none";
+  });
 
   // ---- 10 家族の論点表 → 窓口 ----
   resume();

@@ -68,3 +68,8 @@ body.washi-ground {
     transition-duration: 0.001ms !important;
   }
 }
+
+/* 日本語の折り返しを文節単位に（Chrome 内蔵の BudouX）。未対応ブラウザは通常の折り返し */
+body {
+  word-break: auto-phrase;
+}

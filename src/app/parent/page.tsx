@@ -173,7 +173,7 @@ export default function ParentPage() {
               transition={{ type: "spring", stiffness: 170, damping: 26 }}
               className="w-full text-center"
             >
-              <p className="font-fude text-3xl text-sumi-900 leading-snug">{question.prompt}</p>
+              <p className="font-body font-bold text-3xl text-sumi-900 leading-snug">{question.prompt}</p>
             </motion.div>
           )}
           {currentChunk && (
@@ -182,7 +182,7 @@ export default function ParentPage() {
               initial={{ y: 8, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
               exit={{ y: -8, opacity: 0 }}
-              className="font-fude text-2xl text-sumi-700 text-center leading-snug"
+              className="font-mincho font-bold text-2xl text-sumi-700 text-center leading-snug"
             >
               「{currentChunk}」
             </motion.p>

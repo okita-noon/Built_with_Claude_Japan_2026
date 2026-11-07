@@ -22,7 +22,11 @@
     "recurring_charges": "無",
     "position": "confirmed",
     "evidence": {
-      "boundary": { "value": "親の証言のみ", "confidence": 0.4, "source": "shogen" }
+      "boundary": {
+        "value": "親の証言のみ",
+        "confidence": 0.4,
+        "source": "shogen"
+      }
     },
     "shogen": "栗の木のとこまでがうち。隣とはもめたことない"
   },
@@ -38,7 +42,7 @@
     "hisouzokunin_shibou": "2019-06-10",
     "building": "無",
     "structures": [],
-    "boundary": "任意座標系・位置未確定",
+    "boundary": "隣地と確認済（親の証言）",
     "others_use": "不明",
     "rights": "不明",
     "cliff": "無",

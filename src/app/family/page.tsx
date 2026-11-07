@@ -158,7 +158,7 @@ export default function FamilyPage() {
     const yes = choice === 0;
     switch (question.code) {
       case "Q_BOUNDARY":
-        updated.boundary = yes ? "隣地と確認済・境界杭あり" : "親の証言のみ（栗の木まで）";
+        updated.boundary = yes ? "隣地と確認済（親の証言）" : "親の証言のみ（隣と確認したことはない）";
         break;
       case "Q_BUILDING":
         updated.building = yes ? "有（屋根と壁あり・未登記）" : "無";
@@ -177,6 +177,12 @@ export default function FamilyPage() {
         break;
       case "Q_UNDERGROUND":
         updated.underground = yes ? "有（埋めた覚え）" : "無";
+        break;
+      case "Q_ACQUISITION":
+        updated.shutoku = yes ? "売買" : "相続";
+        break;
+      case "Q_HEIRS":
+        updated.shogen = `${updated.shogen ? updated.shogen + " " : ""}（被相続人の兄弟：${yes ? "全員亡くなっている" : "存命の人がいる"}）`;
         break;
       case "Q_DEBT":
         updated.recurring_charges = yes ? "有（土地改良区の賦課金）" : "無";
@@ -231,7 +237,7 @@ export default function FamilyPage() {
           {liveTranscript && (
             <div className="flex-1 bg-washi border border-sumi-300 rounded-md px-4 py-3 stroke-edge">
               <div className="text-xs font-mincho text-sumi-400">親の発話（Live）</div>
-              <div className="font-fude text-lg text-sumi-900 leading-snug mt-1">「{liveTranscript}」</div>
+              <div className="font-mincho font-bold text-lg text-sumi-900 leading-snug mt-1">「{liveTranscript}」</div>
             </div>
           )}
           {fatigue !== null && (
