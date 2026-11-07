@@ -28,18 +28,22 @@ export type LiveSession = { stop: () => void };
 
 const WORKLET = `
 class PcmDown extends AudioWorkletProcessor {
-  constructor() { super(); this.ratio = sampleRate / 16000; this.acc = []; this.pos = 0; }
+  constructor() { super(); this.ratio = sampleRate / 16000; this.acc = []; this.sum = 0; this.n = 0; this.t = 0; }
   process(inputs) {
     const ch = inputs[0] && inputs[0][0];
     if (!ch) return true;
     let sum = 0;
     for (let i = 0; i < ch.length; i++) sum += ch[i] * ch[i];
-    // 単純な間引き（音声認識用途には十分）
-    for (; this.pos < ch.length; this.pos += this.ratio) {
-      const s = Math.max(-1, Math.min(1, ch[Math.floor(this.pos)]));
-      this.acc.push(s < 0 ? s * 0x8000 : s * 0x7fff);
+    // 区間平均で 16kHz に落とす（簡易な低域通過を兼ねる）
+    for (let i = 0; i < ch.length; i++) {
+      this.sum += ch[i]; this.n++; this.t++;
+      if (this.t >= this.ratio) { // 44.1kHz など割り切れないレートでも 16kHz を保つ
+        this.t -= this.ratio;
+        const s = Math.max(-1, Math.min(1, this.sum / this.n));
+        this.acc.push(s < 0 ? s * 0x8000 : s * 0x7fff);
+        this.sum = 0; this.n = 0;
+      }
     }
-    this.pos -= ch.length;
     if (this.acc.length >= 1600) { // 100ms ごとに送る
       const buf = new Int16Array(this.acc);
       this.acc = [];
@@ -92,6 +96,10 @@ export async function startLive(h: LiveHandlers): Promise<LiveSession> {
 
   const ws = new WebSocket(`${WS_URL}?access_token=${encodeURIComponent(tok.token)}`);
   let ready = false;
+  // 接続が整う前に話し始めた分も捨てない（最大 5 秒ぶん）
+  const pending: string[] = [];
+  const sendAudio = (b64: string) =>
+    ws.send(JSON.stringify({ realtimeInput: { audio: { data: b64, mimeType: "audio/pcm;rate=16000" } } }));
   let partial = "";
   let closed = false;
 
@@ -132,6 +140,7 @@ export async function startLive(h: LiveHandlers): Promise<LiveSession> {
     try { msg = JSON.parse(raw); } catch { return; }
     if (msg.setupComplete) {
       ready = true;
+      pending.splice(0).forEach(sendAudio);
       h.onState?.("listening");
       return;
     }
@@ -142,7 +151,8 @@ export async function startLive(h: LiveHandlers): Promise<LiveSession> {
       partial += t;
       h.onPartial?.(partial.trim());
     }
-    if ((sc.turnComplete || sc.generationComplete) && partial.trim()) {
+    // Gemini が返事を始めた時点で親の発話は終わっている。返事の生成完了（数秒後）を待たずに確定する
+    if ((sc.modelTurn || sc.turnComplete || sc.generationComplete) && partial.trim()) {
       h.onUtterance(partial.trim());
       partial = "";
     }
@@ -158,12 +168,12 @@ export async function startLive(h: LiveHandlers): Promise<LiveSession> {
 
   node.port.onmessage = (e: MessageEvent<{ pcm: ArrayBuffer; level: number }>) => {
     h.onLevel?.(Math.min(1, e.data.level * 4));
-    if (!ready || ws.readyState !== WebSocket.OPEN) return;
-    ws.send(
-      JSON.stringify({
-        realtimeInput: { audio: { data: toBase64(e.data.pcm), mimeType: "audio/pcm;rate=16000" } },
-      })
-    );
+    const b64 = toBase64(e.data.pcm);
+    if (!ready || ws.readyState !== WebSocket.OPEN) {
+      if (pending.length < 50) pending.push(b64);
+      return;
+    }
+    sendAudio(b64);
   };
 
   return { stop };
