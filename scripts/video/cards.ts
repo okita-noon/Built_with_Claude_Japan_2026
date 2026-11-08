@@ -63,7 +63,7 @@ function archHtml(): string {
   ${box(780, 340, 320, 260, "Jev", "その場でタグ付け<br>どの土地の話か<br>何の事実か・疲れ", C.sumi700)}
   ${box(1160, 340, 380, 270, "Claude", "判定・理由<br>次の二択の質問<br>士業法ガードの言い換え", C.beni)}
   ${box(1600, 340, 260, 260, "家族", "地図<br>カード<br>論点", C.matcha)}
-  ${box(1065, 740, 570, 250, "Skills", "制度の要件・士業の線引き（.claude/skills）<br>開発の Claude Code と本番で共用", C.kincha)}
+  ${box(1065, 740, 570, 250, "Skills", "制度の要件<br>士業の線引き", C.kincha)}
   ${box(1065, 70, 570, 185, "評価（evals/）", "判定25件・ガード50件・効果測定25件", C.sumi700)}
   </body></html>`;
 }
