@@ -1,4 +1,4 @@
-# 筆のこえ（仮称）— Claude Code 引き継ぎ
+# 筆のこえ — Claude Code 引き継ぎ
 
 ハッカソン「Built with Claude Code: Japan 2026」（締切 2026-11-10 14:00 JST、目標提出 11/10 12:00）の作品。1人開発。
 
@@ -40,13 +40,14 @@
 
 Claude API は音声を直接受けない。音声は Gemini、Claude には文字起こしと画像を渡す。
 
-## 構成（推奨。初日に確定してよい）
+## 構成（11/8 時点）
 
-- フロント：Next.js（App Router）＋TypeScript、MapLibre GL JS＋PMTiles、アニメーションは Motion（motion.dev）と View Transitions API
-- 地図：地理院シームレス空中写真タイル、登記所備付地図（公共座標系の筆のみ）、和歌山県の林班・小班 Shapefile（山の表示用。筆が重ならない山はこちらで示す）
-- サーバー：Next.js の Route Handlers。Gemini の ephemeral token 発行、Jev 呼び出し、Claude 呼び出し
-- 保存：開発中はローカルの SQLite。公開デモは Vercel＋Neon Postgres（`docs/setup.md`）
-- MCP：`packages/fude-mcp`（stdio）。開発中は Claude Code から、本番はサーバーからツールとして呼ぶ
+- フロント：Next.js（App Router）＋TypeScript、MapLibre GL JS、アニメーションは Motion（motion.dev）
+- 地図：地理院シームレス空中写真タイル。筆は `data/demo/fude.geojson`（架空）。登記所備付地図・林班/小班の実データは未取り込み
+- サーバー：Next.js の Route Handlers（Gemini の ephemeral token 発行、Jev、Claude）。Cloudflare Workers（OpenNext）で `https://fudekoe.okita.dev` に公開
+- 保存：なし。親の画面と家族の画面は BroadcastChannel で同じブラウザのタブ間を中継
+- Claude：`claude-sonnet-5-5`。`tool_choice` の強制は 400 になるので `auto`＋「必ずツールを呼ぶ」指示。Skills は `npm run skills:bundle` で本番に同梱
+- 未実装：`fude-mcp`（法令・地図の MCP）、課税明細書の画像入力（`/api/ocr` は固定データ）、画面出力への士業法ガードの常時適用
 
 ## データの扱い
 

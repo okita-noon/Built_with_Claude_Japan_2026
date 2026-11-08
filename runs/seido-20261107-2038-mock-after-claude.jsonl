@@ -1,0 +1,3 @@
+{"id":"S01","verdict":"判断に必要な情報が足りない","reasons":[],"asks":["Q_BOUNDARY"],"deadlines":[{"code":"DL_TOUKI","date":"2027-03-31"},{"code":"DL_NOUCHI_TODOKE"}],"flags":[],"text":"大字◯◯ 101は、境界を現地で示せるかが分かれば判定できる。親に聞き直す。"}
+{"id":"S02","verdict":"申請不可","reasons":["R_BUILDING"],"asks":[],"deadlines":[{"code":"DL_TOUKI","date":"2027-03-31"}],"flags":[],"text":"大字◯◯ 102は、建物があるのため、相続土地国庫帰属の対象外になる可能性が高い。最終判断は法務局の審査。"}
+{"id":"S03","verdict":"不承認の可能性が高い","reasons":["D_FOREST"],"asks":[],"deadlines":[{"code":"DL_TOUKI","date":"2027-03-31"},{"code":"DL_SHINRIN_TODOKE"}],"flags":[],"text":"大字◯◯ 201は、手入れされていない人工林のため、不承認になる可能性がある。他の選択肢（農地バンク・森林経営管理制度・保留）も並べて考える。"}

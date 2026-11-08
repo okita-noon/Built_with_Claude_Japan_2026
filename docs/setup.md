@@ -9,7 +9,6 @@
 | 3 ★ | Jev API キー | TypeSafe AI のコンソール（取得済み） | 入力 $0.042/1Mトークン | 会話中の即時判断、ガード |
 | 4 ★ | GitHub の公開リポジトリ | GitHub | 無料 | 提出（OSS 要件の可能性） |
 | 5 ★ | Cloudflare アカウント | Cloudflare | 無料枠 | スマホのマイクは HTTPS 必須のため公開URLが要る（Workers + カスタムドメイン） |
-| 6 | Neon Postgres | Vercel Marketplace から追加 | 無料枠 | 家族で共有する筆カードの保存（ローカルは SQLite でよい） |
 | 7 ★ | G空間情報センターのアカウント | G空間情報センター（無料登録） | 無料 | 日高町の登記所備付地図XMLをダウンロード |
 | 8 | 和歌山県の森林計画情報 | 県の公開サービス（申請不要・注意事項に同意） | 無料 | 林班・小班 Shapefile、日高町の森林資源 Excel |
 | — | e-Gov 法令API v2 | キー不要 | 無料 | 条文の取得と引用の実在確認 |
@@ -25,7 +24,7 @@
 
 Anthropic 直 API の設定（Claude 呼び出し）
 - `ANTHROPIC_API_KEY`：console.anthropic.com で発行
-- `CLAUDE_MODEL`：モデル ID（例：`claude-opus-4-7`, `claude-sonnet-4-6`）
+- `CLAUDE_MODEL`：モデル ID（評価と本番は `claude-sonnet-5-5`）。Sonnet 5.5 は `tool_choice` の強制指定が 400 になるため、`auto`＋「必ずツールを呼ぶ」指示で使う
 - ローカルは `.env.local` に書く。Cloudflare Workers 上では `wrangler secret put ANTHROPIC_API_KEY` で登録
 
 ## Cloudflare 側の設定（Bot 対策）
@@ -48,10 +47,16 @@ AI 学習クローラーと営業系スクレイパーだけを落とす。
 - `robots.txt` で同じクローラーを拒否（polite layer）
 - ダッシュボード側が落ちても最低限の遮断が残るように二重化
 
-## 初日に確かめること
+## その他のキー
 
-- [ ] 運営に確認：他社API（Gemini・Jev）の利用可否、既存コードの扱い、OSS の範囲、動画の長さ
-- [ ] 日高町の地図XMLの座標系（公共座標系か任意座標系か）。`map-data` サブエージェントに割合を出させる
-- [ ] 親の声で Gemini Live を試す：方言の聞き取り、応答の遅さ、言語指定が効くか
-- [ ] Jev の応答時間を実測（会話中の判断に間に合うか）
-- [ ] 親に、声の利用（デモ動画）について同意を取るか、再現音声にするか決める
+- `GEMINI_API_KEY`／`GEMINI_LIVE_MODEL`：Google AI Studio で発行。Live のモデルは `gemini-3.8-live` で動作確認済み
+- `GEMINI_TTS_MODEL`：デモ動画のナレーション生成だけで使う。Tier 1 は1モデルあたり1日100回まで（17:00 JST に戻る）。足りなければ `gemini-3.8-flash-lite-tts`
+- `JEV_API_KEY`：TypeSafe AI。`POST https://api.typesafe.ai/v1/systemone` に質問をその場で書いて送る（事前登録なし）。応答は約0.4秒
+
+## 初日に確かめたこと
+
+- [x] Jev の応答時間：約0.4秒で、会話中の判断に間に合う
+- [x] Gemini Live：ブラウザから ephemeral token で接続し、方言の発話を文字に起こせる
+- [x] デモの親の声は合成音声（実在人物の声は使わない）
+- [ ] 運営に確認：他社API（Gemini・Jev）の利用可否、動画の長さ（提出フォームで確認）
+- [ ] 登記所備付地図XML・林班/小班の実データ取り込み（未着手。デモは架空データ）
