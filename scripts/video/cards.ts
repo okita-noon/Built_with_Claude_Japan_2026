@@ -95,19 +95,34 @@ function evalsHtml(): string {
 }
 
 function guardHtml(): string {
+  // 左：AI がそのまま答えた文（止める）／中：ガード／右：画面に出す文
+  const tag = (t: string) =>
+    `<span style="display:inline-block;margin:0 14px 14px 0;padding:8px 20px;border-radius:999px;background:${C.beni};color:${C.washi};font-size:28px;font-weight:700">${t}</span>`;
   return `${HEAD}<div class="brand">筆のこえ</div>
-  <div style="position:absolute;left:160px;top:190px;width:1600px">
-    <div class="mincho" style="font-size:44px;line-height:1.7;color:${C.sumi400};text-decoration:line-through;text-decoration-color:${C.beni};text-decoration-thickness:5px">
-      境界は栗の木までです。この畑は国に引き取ってもらえます。
+  <div style="position:absolute;left:120px;top:150px;font-size:44px;font-weight:700">AI の答えを、画面に出す前に点検する</div>
+  <div style="position:absolute;left:120px;top:270px;width:700px;height:700px;border:3px dashed ${C.sumi300};border-radius:18px;padding:40px 44px">
+    <div style="font-size:32px;font-weight:700;color:${C.sumi500}">AI がそのまま答えると</div>
+    <div class="mincho" style="font-size:46px;line-height:1.6;margin-top:28px;color:${C.sumi500};text-decoration:line-through;text-decoration-color:${C.beni};text-decoration-thickness:5px">
+      境界は栗の木までです。<br>この畑は国に<br>引き取ってもらえます。
     </div>
-    <div style="margin:56px 0 0;width:100%;height:3px;background:${C.deep}"></div>
-    <div style="font-size:56px;font-weight:700;line-height:1.6;margin-top:56px">
-      境界は、母の証言では栗の木まで（参考）。<br>確かめるには、土地家屋調査士へ。
+    <div style="margin-top:44px">${tag("境界を断定")}${tag("国の承認を約束")}</div>
+    <div style="font-size:30px;line-height:1.6;color:${C.sumi700};margin-top:10px">どちらも士業・法務局の判断。<br>信じて動くと、却下や隣ともめる元になる</div>
+  </div>
+  <svg width="200" height="200" style="position:absolute;left:840px;top:520px">
+    <line x1="10" y1="100" x2="170" y2="100" stroke="${C.beni}" stroke-width="8"/>
+    <path d="M150,72 L190,100 L150,128 z" fill="${C.beni}"/>
+  </svg>
+  <div style="position:absolute;left:830px;top:530px;width:220px;text-align:center;font-size:30px;font-weight:700;color:${C.beni}">士業法ガード</div>
+  <div style="position:absolute;left:1070px;top:270px;width:730px;height:700px;border:4px solid ${C.sumi900};border-radius:18px;background:${C.washi};padding:40px 44px;box-shadow:0 10px 30px rgba(26,22,18,.10)">
+    <div style="font-size:32px;font-weight:700;color:${C.matcha}">筆のこえが画面に出す文</div>
+    <div style="font-size:48px;font-weight:700;line-height:1.55;margin-top:28px">
+      境界は、母の証言では<br>栗の木まで（参考）。<br>確かめるには、<br>土地家屋調査士へ。
     </div>
-    <div class="mincho" style="font-size:38px;line-height:1.8;color:${C.sumi700};margin-top:36px">
-      持っていく物：課税明細書／公図の写し／現地の写真<br>最終判断は法務局の審査です。
+    <div class="mincho" style="font-size:32px;line-height:1.7;color:${C.sumi700};margin-top:30px">
+      持っていく物：課税明細書、<br>公図の写し、現地の写真<br>最終判断は法務局の審査です。
     </div>
-  </div></body></html>`;
+  </div>
+  </body></html>`;
 }
 
 async function main() {
