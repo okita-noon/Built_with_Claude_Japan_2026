@@ -65,7 +65,7 @@ export function MapView({ geo, activeId, verdictOf, onSelect }: Props) {
     const map = new maplibregl.Map({
       container: containerRef.current,
       style: STYLE,
-      center: [135.5008, 33.95005],
+      center: [135.4364, 33.7988],
       zoom: 15.5,
       attributionControl: { compact: true },
     });

@@ -69,28 +69,37 @@ function archHtml(): string {
 }
 
 function evalsHtml(): string {
-  const bar = (label: string, before: number, after: number, y: number) => `
-  <div style="position:absolute;left:160px;top:${y}px;width:1600px">
-    <div style="font-size:46px;font-weight:700">${label}</div>
-    <div style="display:flex;align-items:center;gap:28px;margin-top:18px">
-      <div style="width:230px;font-size:30px;color:${C.sumi500}">アプリなし</div>
-      <div style="height:50px;width:${before * 11}px;background:${C.sumi300};border-radius:6px"></div>
-      <div style="font-size:46px;font-weight:700;color:${C.sumi500}">${before}%</div>
+  // 数字はすべて runs/effect-20261107-1722.jsonl（25件・各8問）から。項目ごとの全数値は docs/eval-log.md
+  const bar = (label: string, n: number, before: number, after: number, y: number) => `
+  <div style="position:absolute;left:1000px;top:${y}px;width:820px">
+    <div style="font-size:34px;font-weight:700">${label}</div>
+    <div style="display:flex;align-items:center;gap:18px;margin-top:10px">
+      <div style="height:30px;width:${(before / n) * 560}px;background:${C.sumi300};border-radius:5px"></div>
+      <div style="font-size:30px;font-weight:700;color:${C.sumi500}">${before}/${n}</div>
     </div>
-    <div style="display:flex;align-items:center;gap:28px;margin-top:14px">
-      <div style="width:230px;font-size:30px;font-weight:700;color:${C.sumi900}">アプリあり</div>
-      <div style="height:50px;width:${after * 11}px;background:${C.beni};border-radius:6px"></div>
-      <div style="font-size:58px;font-weight:700;color:${C.beni}">${after}%</div>
+    <div style="display:flex;align-items:center;gap:18px;margin-top:8px">
+      <div style="height:30px;width:${(after / n) * 560}px;background:${C.beni};border-radius:5px"></div>
+      <div style="font-size:38px;font-weight:700;color:${C.beni}">${after}/${n}</div>
     </div>
   </div>`;
   return `${HEAD}<div class="brand">筆のこえ</div>
-  <div style="position:absolute;left:160px;top:120px;font-size:34px;color:${C.sumi700}">親役・子役を AI で模擬し、8問ずつ聞き取り（25件）</div>
-  ${bar("必要な項目を聞き出せた", 49, 70, 200)}
-  ${bar("判定が正解と一致", 72, 84, 470)}
-  <div style="position:absolute;left:160px;top:760px;font-size:38px;font-weight:700;color:${C.sumi900}">
-    Skills で判定 <span style="color:${C.sumi500}">84%</span> → <span style="color:${C.beni}">100%</span>　／　士業ガード 96%以上・止めすぎ <span style="color:${C.matcha}">0件</span>
+  <div style="position:absolute;left:120px;top:150px;font-size:34px;color:${C.sumi700}">AI が演じる親に、8問ずつ聞き取り（25件）　<span style="color:${C.sumi500}"><span style="color:${C.sumi300}">■</span> アプリなし</span>　<span style="color:${C.beni};font-weight:700">■ アプリあり</span></div>
+  <div style="position:absolute;left:120px;top:250px;width:800px">
+    <div style="font-size:40px;font-weight:700;line-height:1.5">申請できるかを左右する<br>「土地をどう手に入れたか」</div>
+    <div style="display:flex;align-items:baseline;gap:30px;margin-top:30px">
+      <div style="font-size:120px;font-weight:700;color:${C.sumi400}">6</div>
+      <div style="font-size:60px;color:${C.sumi400}">→</div>
+      <div style="font-size:200px;font-weight:700;color:${C.beni};line-height:1">25</div>
+      <div style="font-size:44px;font-weight:700;color:${C.beni}">件</div>
+    </div>
+    <div style="font-size:30px;color:${C.sumi700};margin-top:10px">25件中、カードに残せた件数</div>
+    <div style="font-size:38px;font-weight:700;margin-top:70px">申請できない土地を見抜けた</div>
+    <div style="font-size:56px;font-weight:700;margin-top:6px"><span style="color:${C.sumi400}">8</span> <span style="color:${C.sumi400};font-size:40px">→</span> <span style="color:${C.beni}">10</span><span style="font-size:32px;color:${C.sumi700}">　／10件</span></div>
   </div>
-  <div style="position:absolute;left:160px;top:900px;width:1600px;font-size:24px;line-height:1.6;color:${C.sumi400}">claude-sonnet-5-5。模擬の聞き取りで、実際の家族での効果ではありません。判定の100%は同じ25件を見ながら直した値（docs/eval-log.md）</div>
+  ${bar("急な崖", 24, 13, 24, 250)}
+  ${bar("隣とのもめごと・通り道", 25, 13, 23, 450)}
+  ${bar("毎年かかるお金（土地改良区など）", 25, 3, 15, 650)}
+  <div style="position:absolute;left:120px;top:940px;width:1700px;font-size:22px;line-height:1.6;color:${C.sumi400}">親役・子役・採点とも Claude による模擬（claude-sonnet-5-5、1回の実行）。実際の家族での効果ではありません。親が答えを知っている件数あたりの値。全11項目の平均は 49%→70%（項目別の全数値は docs/eval-log.md）。</div>
   </body></html>`;
 }
 

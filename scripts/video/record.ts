@@ -191,7 +191,10 @@ async function main() {
     );
   });
   await sleep(1.0);
-  await family.getByRole("button", { name: ask.choice }).click();
+  // 二択の文言は Claude が毎回つくるので、意味で選ぶ（見つからなければ従来の文言）
+  const choiceRe = { use: /誰も|だれも|使って(い)?ない|いない|おらん/, security: /して(い)?ない|ない/, boundary: /ない/ }[ask.key];
+  const btn = family.getByRole("button", { name: choiceRe }).first();
+  await ((await btn.isVisible().catch(() => false)) ? btn : family.getByRole("button", { name: ask.choice })).click();
   await sleep(0.5);
   cut();
   // 答えが反映され、次の質問に替わるまで待つ（Claude の待ちは切る）

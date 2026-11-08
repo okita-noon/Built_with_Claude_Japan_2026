@@ -40,7 +40,7 @@ function buildBody(props: Props): string {
   lines.push(INTROS[props.office]);
   lines.push("");
   lines.push("【対象の土地】");
-  if (townName) lines.push(`所在地：和歌山県日高郡 ${townName}（架空デモの地番）`);
+  if (townName) lines.push(`所在地：和歌山県田辺市 ${townName}（架空デモの地番）`);
   items.forEach((x, i) => {
     const area = x.card.menseki_m2 ? `${x.card.menseki_m2.toLocaleString()} m²` : "面積不明";
     lines.push(`${i + 1}. ${x.card.chiban}（${x.card.toki_chimoku}・${area}）／筆のこえ上の判定：${x.judge.verdict}`);
